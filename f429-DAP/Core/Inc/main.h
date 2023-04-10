@@ -63,6 +63,10 @@ void Error_Handler(void);
 #define SWDIO_PIN_GPIO_Port GPIOG
 #define SWCLK_PIN_Pin GPIO_PIN_3
 #define SWCLK_PIN_GPIO_Port GPIOG
+#define LED_3_Pin GPIO_PIN_13
+#define LED_3_GPIO_Port GPIOG
+#define LED_4_Pin GPIO_PIN_14
+#define LED_4_GPIO_Port GPIOG
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
