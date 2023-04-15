@@ -22,7 +22,7 @@
 #include "usbd_custom_hid_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-
+#include "app.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -148,7 +148,7 @@ static int8_t CUSTOM_HID_OutEvent_HS(uint8_t event_idx, uint8_t state);
 #ifdef USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED
 static int8_t CUSTOM_HID_CtrlReqComplete_HS(uint8_t request, uint16_t wLength);
 #endif /* USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED */
-static int8_t CUSTOM_HID_InEvent_HS(uint8_t event_idx, uint8_t state)
+static int8_t CUSTOM_HID_InEvent_HS(uint8_t event_idx, uint8_t state);
 
 
 #ifdef USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED
@@ -188,6 +188,7 @@ USBD_CUSTOM_HID_ItfTypeDef USBD_CustomHID_fops_HS =
 static int8_t CUSTOM_HID_Init_HS(void)
 {
   /* USER CODE BEGIN 8 */
+  DAP_USB_Initialize();  //initialize the DAP<->USB communication
   return (USBD_OK);
   /* USER CODE END 8 */
 }
@@ -272,13 +273,13 @@ static uint8_t *CUSTOM_HID_GetReport_HS(uint16_t *ReportLength)
   return (pbuff);
 }
 #endif /* USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED */
-
+}
 /* USER CODE BEGIN 11 */
 
 static int8_t CUSTOM_HID_InEvent_HS(uint8_t event_idx, uint8_t state)
 {
   /* USER CODE BEGIN extra */
-  USBD_InEvent();       /* INPUT REPORT has been sent. Zach Lee */
+  USBD_InEvent();       /* INPUT REPORT has been sent */
   return (USBD_OK);
   /* USER CODE END extra */
 }
