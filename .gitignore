@@ -54,3 +54,7 @@ dkms.conf
 
 #IDE preferences
 *language.settings.xml
+
+#Project specific extras
+*f429-DAP/DAP_Examples_from_v5.8/
+*f746-DAP/DAP_Examples_from_v5.8/

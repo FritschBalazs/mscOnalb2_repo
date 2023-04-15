@@ -45,11 +45,11 @@ extern "C" {
 #endif /* CUSTOM_HID_EPIN_ADDR */
 
 #ifndef CUSTOM_HID_EPIN_SIZE
-#define CUSTOM_HID_EPIN_SIZE                         0x02U
+#define CUSTOM_HID_EPIN_SIZE                         0x40U
 #endif /* CUSTOM_HID_EPIN_SIZE */
 
 #ifndef CUSTOM_HID_EPOUT_ADDR
-#define CUSTOM_HID_EPOUT_ADDR                        0x01U
+#define CUSTOM_HID_EPOUT_ADDR                        0x40U
 #endif /* CUSTOM_HID_EPOUT_ADDR */
 
 #ifndef CUSTOM_HID_EPOUT_SIZE
@@ -60,11 +60,11 @@ extern "C" {
 #define USB_CUSTOM_HID_DESC_SIZ                      9U
 
 #ifndef CUSTOM_HID_HS_BINTERVAL
-#define CUSTOM_HID_HS_BINTERVAL                      0x05U
+#define CUSTOM_HID_HS_BINTERVAL                      0x01U
 #endif /* CUSTOM_HID_HS_BINTERVAL */
 
 #ifndef CUSTOM_HID_FS_BINTERVAL
-#define CUSTOM_HID_FS_BINTERVAL                      0x05U
+#define CUSTOM_HID_FS_BINTERVAL                      0x01U
 #endif /* CUSTOM_HID_FS_BINTERVAL */
 
 #ifndef USBD_CUSTOMHID_OUTREPORT_BUF_SIZE
@@ -106,6 +106,8 @@ typedef struct _USBD_CUSTOM_HID_Itf
   int8_t (* Init)(void);
   int8_t (* DeInit)(void);
   int8_t (* OutEvent)(uint8_t event_idx, uint8_t state);
+  /* Added by me */
+  int8_t (* InEvent)(uint8_t event_idx, uint8_t state);
 
 } USBD_CUSTOM_HID_ItfTypeDef;
 

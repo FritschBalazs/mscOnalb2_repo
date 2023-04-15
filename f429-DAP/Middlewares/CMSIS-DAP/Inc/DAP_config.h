@@ -501,7 +501,7 @@ __STATIC_FORCEINLINE uint32_t PIN_nRESET_IN  (void) {
            - 1: release device hardware reset.
 */
 __STATIC_FORCEINLINE void     PIN_nRESET_OUT (uint32_t bit) {
-  HAL_GPIO_WritePin(TARGET_RESET_PIN_GPIO_Port, TARGET_RESET_PIN_Pin, bit);
+  HAL_GPIO_WritePin(TARGET_RESET_PIN_GPIO_Port, TARGET_RESET_PIN_Pin, (bit & 1U));
 }
 
 ///@}
@@ -557,7 +557,7 @@ default, the DWT timer is used.  The frequency of this timer is configured with 
 \return Current timestamp value.
 */
 __STATIC_INLINE uint32_t TIMESTAMP_GET (void) {
-  return (DWT->CYCCNT);
+  return (DWT->CYCCNT);    //TODO ez egy valszeg nem lesz jo
 }
 
 ///@}

@@ -146,6 +146,7 @@ extern USBD_HandleTypeDef hUsbDeviceHS;
 static int8_t CUSTOM_HID_Init_HS(void);
 static int8_t CUSTOM_HID_DeInit_HS(void);
 static int8_t CUSTOM_HID_OutEvent_HS(uint8_t event_idx, uint8_t state);
+static int8_t CUSTOM_HID_InEvent_HS(uint8_t event_idx, uint8_t state);  /* An extra interface func. */
 
 /**
   * @}
@@ -156,7 +157,9 @@ USBD_CUSTOM_HID_ItfTypeDef USBD_CustomHID_fops_HS =
   CUSTOM_HID_ReportDesc_HS,
   CUSTOM_HID_Init_HS,
   CUSTOM_HID_DeInit_HS,
-  CUSTOM_HID_OutEvent_HS
+  CUSTOM_HID_OutEvent_HS,
+  /* I add an extra interface func below. Zach Lee */
+  CUSTOM_HID_InEvent_HS,
 };
 
 /** @defgroup USBD_CUSTOM_HID_Private_Functions USBD_CUSTOM_HID_Private_Functions
@@ -173,6 +176,7 @@ USBD_CUSTOM_HID_ItfTypeDef USBD_CustomHID_fops_HS =
 static int8_t CUSTOM_HID_Init_HS(void)
 {
   /* USER CODE BEGIN 8 */
+  USBD_HID0_Initialize(); /* Initialize USB communication of DAP */
   return (USBD_OK);
   /* USER CODE END 8 */
 }
@@ -184,6 +188,7 @@ static int8_t CUSTOM_HID_Init_HS(void)
 static int8_t CUSTOM_HID_DeInit_HS(void)
 {
   /* USER CODE BEGIN 9 */
+	USBD_HID0_Uninitialize(); /* Uninitialize DAP related things */
   return (USBD_OK);
   /* USER CODE END 9 */
 }
@@ -197,20 +202,21 @@ static int8_t CUSTOM_HID_DeInit_HS(void)
 static int8_t CUSTOM_HID_OutEvent_HS(uint8_t event_idx, uint8_t state)
 {
   /* USER CODE BEGIN 10 */
-  UNUSED(event_idx);
-  UNUSED(state);
-
-    /* Start next USB packet transfer once data processing is completed */
-  if (USBD_CUSTOM_HID_ReceivePacket(&hUsbDeviceHS) != (uint8_t)USBD_OK)
-  {
-    return -1;
-  }
-
+  USBD_OutEvent();     //lehet kell majd extern /* OUTPUT REPORT was received. */
   return (USBD_OK);
   /* USER CODE END 10 */
 }
 
 /* USER CODE BEGIN 11 */
+
+static int8_t CUSTOM_HID_InEvent_HS(uint8_t event_idx, uint8_t state)
+{
+  /* USER CODE BEGIN extra */
+  USBD_InEvent();       /* INPUT REPORT has been sent. */
+  return (USBD_OK);
+  /* USER CODE END extra */
+}
+
 /**
   * @brief  Send the report to the Host
   * @param  report: The report to be sent

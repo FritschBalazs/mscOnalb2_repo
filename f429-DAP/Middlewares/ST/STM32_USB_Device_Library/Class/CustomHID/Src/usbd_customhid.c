@@ -607,7 +607,11 @@ static uint8_t USBD_CUSTOM_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum)
 
   /* Ensure that the FIFO is empty before a new transfer, this condition could
   be caused by  a new transfer before the end of the previous transfer */
-  ((USBD_CUSTOM_HID_HandleTypeDef *)pdev->pClassDataCmsit[pdev->classId])->state = CUSTOM_HID_IDLE;
+  USBD_CUSTOM_HID_HandleTypeDef     *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)pdev->pClassDataCmsit[pdev->classId];
+  hhid->state = CUSTOM_HID_IDLE;
+
+  /* new interface, added by me */
+  ((USBD_CUSTOM_HID_ItfTypeDef *)pdev->pUserData)->InEvent(hhid->Report_buf[0],hhid->Report_buf[1]);
 
   return (uint8_t)USBD_OK;
 }
