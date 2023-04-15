@@ -91,6 +91,7 @@ int main(void)
   MX_USB_DEVICE_Init();
   MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Base_Start(&htim14);
 
   /* USER CODE END 2 */
 
