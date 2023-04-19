@@ -150,7 +150,6 @@ static int8_t CUSTOM_HID_CtrlReqComplete_HS(uint8_t request, uint16_t wLength);
 #endif /* USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED */
 static int8_t CUSTOM_HID_InEvent_HS(uint8_t event_idx, uint8_t state);
 
-
 #ifdef USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED
 static uint8_t *CUSTOM_HID_GetReport_HS(uint16_t *ReportLength);
 #endif /* USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED */
@@ -273,9 +272,9 @@ static uint8_t *CUSTOM_HID_GetReport_HS(uint16_t *ReportLength)
   return (pbuff);
 }
 #endif /* USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED */
-}
-/* USER CODE BEGIN 11 */
 
+/* USER CODE BEGIN 11 */
+}
 static int8_t CUSTOM_HID_InEvent_HS(uint8_t event_idx, uint8_t state)
 {
   /* USER CODE BEGIN extra */

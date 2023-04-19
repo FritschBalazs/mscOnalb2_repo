@@ -100,8 +100,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	APP_Run();
+	
     /* USER CODE BEGIN 3 */
+    APP_Run();
   }
   /* USER CODE END 3 */
 }

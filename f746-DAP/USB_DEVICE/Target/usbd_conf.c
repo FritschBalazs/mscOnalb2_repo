@@ -74,17 +74,16 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef* pcdHandle)
   /* USER CODE END USB_OTG_HS_MspInit 0 */
 
     __HAL_RCC_GPIOB_CLK_ENABLE();
-    __HAL_RCC_GPIOI_CLK_ENABLE();
     __HAL_RCC_GPIOH_CLK_ENABLE();
     __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOA_CLK_ENABLE();
     /**USB_OTG_HS GPIO Configuration
     PB5     ------> USB_OTG_HS_ULPI_D7
-    PI11     ------> USB_OTG_HS_ULPI_DIR
     PH4     ------> USB_OTG_HS_ULPI_NXT
     PB13     ------> USB_OTG_HS_ULPI_D6
     PB12     ------> USB_OTG_HS_ULPI_D5
     PC0     ------> USB_OTG_HS_ULPI_STP
+    PC2     ------> USB_OTG_HS_ULPI_DIR
     PA5     ------> USB_OTG_HS_ULPI_CK
     PB10     ------> USB_OTG_HS_ULPI_D3
     PA3     ------> USB_OTG_HS_ULPI_D0
@@ -100,13 +99,6 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef* pcdHandle)
     GPIO_InitStruct.Alternate = GPIO_AF10_OTG_HS;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_11;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF10_OTG_HS;
-    HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
-
     GPIO_InitStruct.Pin = GPIO_PIN_4;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -114,7 +106,7 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef* pcdHandle)
     GPIO_InitStruct.Alternate = GPIO_AF10_OTG_HS;
     HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_0;
+    GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_2;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -154,11 +146,11 @@ void HAL_PCD_MspDeInit(PCD_HandleTypeDef* pcdHandle)
 
     /**USB_OTG_HS GPIO Configuration
     PB5     ------> USB_OTG_HS_ULPI_D7
-    PI11     ------> USB_OTG_HS_ULPI_DIR
     PH4     ------> USB_OTG_HS_ULPI_NXT
     PB13     ------> USB_OTG_HS_ULPI_D6
     PB12     ------> USB_OTG_HS_ULPI_D5
     PC0     ------> USB_OTG_HS_ULPI_STP
+    PC2     ------> USB_OTG_HS_ULPI_DIR
     PA5     ------> USB_OTG_HS_ULPI_CK
     PB10     ------> USB_OTG_HS_ULPI_D3
     PA3     ------> USB_OTG_HS_ULPI_D0
@@ -169,11 +161,9 @@ void HAL_PCD_MspDeInit(PCD_HandleTypeDef* pcdHandle)
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_5|GPIO_PIN_13|GPIO_PIN_12|GPIO_PIN_10
                           |GPIO_PIN_1|GPIO_PIN_0|GPIO_PIN_11);
 
-    HAL_GPIO_DeInit(GPIOI, GPIO_PIN_11);
-
     HAL_GPIO_DeInit(GPIOH, GPIO_PIN_4);
 
-    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_0);
+    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_0|GPIO_PIN_2);
 
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_5|GPIO_PIN_3);
 
