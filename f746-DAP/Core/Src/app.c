@@ -40,6 +40,8 @@ void DAP_USB_Initialize (void);
 int32_t HID0_GetReport (uint8_t rtype, uint8_t req, uint8_t rid, uint8_t *buf);
 bool HID0_SetReport (uint8_t rtype, uint8_t req, uint8_t rid, const uint8_t *buf, int32_t len);
 
+
+
 // Called during USBD_Initialize to initialize the USB HID class instance.
 void DAP_USB_Initialize (void) {
   // Initialize variables
@@ -225,5 +227,19 @@ void USBD_InEvent(void){
 void USBD_OutEvent(void){
 	USBD_CUSTOM_HID_HandleTypeDef *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)hUsbDeviceHS.pClassData;
 	HID0_SetReport(HID_REPORT_OUTPUT, 0, 0, hhid->Report_buf, USBD_CUSTOMHID_OUTREPORT_BUF_SIZE);
+
+}
+
+void APP_Setup(void){
+	DAP_Setup();                          // DAP Setup
+
+
+
+	LED_CONNECTED_OUT(1U);                // Turn on  Debugger Connected LED
+	LED_RUNNING_OUT(1U);                  // Turn on  Target Running LED
+	Delayms(500U);                        // Wait for 500ms
+	LED_RUNNING_OUT(0U);                  // Turn off Target Running LED
+	LED_CONNECTED_OUT(0U);                // Turn off Debugger Connected LED
+
 
 }
