@@ -99,17 +99,20 @@ __ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_HS[USBD_CUSTOM_HID_REPORT_DES
 		  0x75,0x08,              /*   REPORT_SIZE (8bit) */
 
 		  // Input Report
-		  0x95,0x00,0x04,         /*   Report Length (1024 REPORT_SIZE) */
+//		  0x95,0x00,0x04,         /*   Report Length (1024 REPORT_SIZE) */
+		  0x95,0x40,         	  /*   Report Length (64 REPORT_SIZE) */
 		  0x09,0x01,              /*   USAGE (Vendor Usage 1) */
 		  0x81,0x02,              /*   Input(data,var,absolute) */
 
 		  // Output Report
-		  0x95,0x00,0x04,         /*   Report Length (1024 REPORT_SIZE) */
+//		  0x95,0x00,0x04,         /*   Report Length (1024 REPORT_SIZE) */
+		  0x95,0x40,         	  /*   Report Length (64 REPORT_SIZE) */
 		  0x09,0x01,              /*   USAGE (Vendor Usage 1) */
 		  0x91,0x02,              /*   Output(data,var,absolute) */
 
 		  // Feature Report
-		  0x95,0x00,0x04,         /*   Report Length (1024 REPORT_SIZE) */
+//		  0x95,0x00,0x04,         /*   Report Length (1024 REPORT_SIZE) */
+		  0x95,0x40,         	  /*   Report Length (64 REPORT_SIZE) */
 		  0x09,0x01,              /*   USAGE (Vendor Usage 1) */
 		  0xB1,0x02,              /*   Feature(data,var,absolute) */
   /* USER CODE END 1 */
