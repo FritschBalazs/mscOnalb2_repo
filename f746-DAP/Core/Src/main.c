@@ -56,7 +56,12 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+int _write(int file, char *ptr, int len)
+{
+	HAL_UART_Transmit_IT( &huart1,  (uint8_t *) ptr,  len);
 
+	return len;
+}
 /* USER CODE END 0 */
 
 /**
@@ -92,6 +97,8 @@ int main(void)
   MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim14);
+
+  printf(__DATE__" " __TIME__"\r\n");
 
   /* USER CODE END 2 */
 

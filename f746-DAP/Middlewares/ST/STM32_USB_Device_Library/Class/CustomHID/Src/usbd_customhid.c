@@ -559,6 +559,7 @@ uint8_t USBD_CUSTOM_HID_SendReport(USBD_HandleTypeDef *pdev,
     {
       hhid->state = CUSTOM_HID_BUSY;
       (void)USBD_LL_Transmit(pdev, CUSTOMHIDInEpAdd, report, len);
+      printf("USBD_LL_Transmit called in USBD_CUSTOM_HID_SendReport() \r\n");
     }
     else
     {
@@ -567,6 +568,7 @@ uint8_t USBD_CUSTOM_HID_SendReport(USBD_HandleTypeDef *pdev,
   }
   return (uint8_t)USBD_OK;
 }
+
 #ifndef USE_USBD_COMPOSITE
 /**
   * @brief  USBD_CUSTOM_HID_GetFSCfgDesc
