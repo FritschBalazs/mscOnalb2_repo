@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dma.h"
 #include "tim.h"
 #include "usart.h"
 #include "usb_device.h"
@@ -94,10 +95,13 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_USB_DEVICE_Init();
+  MX_DMA_Init();
   MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim14);
 
+
+  //printf("\r\n");
   printf(__DATE__" " __TIME__"\r\n");
 
   /* USER CODE END 2 */

@@ -559,7 +559,6 @@ uint8_t USBD_CUSTOM_HID_SendReport(USBD_HandleTypeDef *pdev,
     {
       hhid->state = CUSTOM_HID_BUSY;
       (void)USBD_LL_Transmit(pdev, CUSTOMHIDInEpAdd, report, len);
-      printf("USBD_LL_Transmit called in USBD_CUSTOM_HID_SendReport() \r\n");
     }
     else
     {
@@ -670,8 +669,9 @@ static uint8_t USBD_CUSTOM_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum)
   be caused by  a new transfer before the end of the previous transfer */
   //((USBD_CUSTOM_HID_HandleTypeDef *)pdev->pClassDataCmsit[pdev->classId])->state = CUSTOM_HID_IDLE;
 
-  USBD_CUSTOM_HID_HandleTypeDef * hhid = (USBD_CUSTOM_HID_HandleTypeDef *)pdev;
+  USBD_CUSTOM_HID_HandleTypeDef * hhid = (USBD_CUSTOM_HID_HandleTypeDef *)pdev->pClassDataCmsit[pdev->classId];
   hhid->state = CUSTOM_HID_IDLE;
+
 
   /* I added a new interface func in the structure USBD_CUSTOM_HID_ItfTypeDef. */
 

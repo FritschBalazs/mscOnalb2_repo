@@ -184,7 +184,6 @@ void APP_Run(void){
 
 		  // Execute DAP Command (process request and prepare response)
 		  DAP_ExecuteCommand(USB_Request[USB_RequestIndexO], USB_Response[USB_ResponseIndexI]);
-		  printf("DAP_ExecuteCommand() called \r\n");
 
 		  // Update Request Index and Count
 		  USB_RequestIndexO++;
@@ -214,12 +213,6 @@ void APP_Run(void){
 			}
 		  }
 		}
-	}
-
-	USBD_CUSTOM_HID_HandleTypeDef *hhid = hUsbDeviceHS.pClassDataCmsit[hUsbDeviceHS.classId];
-
-	if(hhid->state == CUSTOM_HID_IDLE){
-		//HID_Send_Report(&hUsbDeviceHS, USB_Response[1], 0);
 	}
 
 
@@ -275,11 +268,21 @@ uint8_t HID_Send_Report(USBD_HandleTypeDef *pdev,uint8_t *report, uint16_t len){
 		pdev->dev_remote_wakeup=0;
 		//remotewakeupon = 1;
 
-		printf("Remote wakeup issued");
+		printf("Remote wakeup \r\n");
 	}
 
-	printf("USBD_CUSTOM_HID_SendReport() called \r\n");
-	return USBD_CUSTOM_HID_SendReport(pdev, report, len);
+	USBD_CUSTOM_HID_HandleTypeDef *hhid = hUsbDeviceHS.pClassDataCmsit[hUsbDeviceHS.classId];
+
+
+
+	while(hhid->state != CUSTOM_HID_IDLE){ //TODO find a longterm solution
+	}
+	
+	if (USBD_CUSTOM_HID_SendReport(pdev, report, len) == CUSTOM_HID_BUSY){
+
+	}
+
+	return 0;
 
 }
 
@@ -292,7 +295,7 @@ void APP_Setup(void){
 	LED_RUNNING_OUT(1U);                  // Turn on  Target Running LED
 	Delayms(500U);                        // Wait for 500ms
 	LED_RUNNING_OUT(0U);                  // Turn off Target Running LED
-	LED_CONNECTED_OUT(0U);                // Turn off Debugger Connected LED
+	LED_CONNECTED_OUT(0U);                // Turn off Debugger Connected LED //TODO connect LED
 
 
 }
