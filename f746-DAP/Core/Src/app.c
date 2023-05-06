@@ -40,7 +40,7 @@ void DAP_USB_Initialize (void);
 int32_t HID0_GetReport (uint8_t rtype, uint8_t req, uint8_t rid, uint8_t *buf);
 bool HID0_SetReport (uint8_t rtype, uint8_t req, uint8_t rid, const uint8_t *buf, int32_t len);
 
-
+volatile uint16_t dbg_cntr = 0;
 
 // Called during USBD_Initialize to initialize the USB HID class instance.
 void DAP_USB_Initialize (void) {
