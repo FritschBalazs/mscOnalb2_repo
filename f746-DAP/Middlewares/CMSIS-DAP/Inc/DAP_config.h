@@ -86,7 +86,7 @@ This information includes:
 /// Default communication speed on the Debug Access Port for SWD and JTAG mode.
 /// Used to initialize the default SWD/JTAG clock frequency.
 /// The command \ref DAP_SWJ_Clock can be used to overwrite this default setting.
-#define DAP_DEFAULT_SWJ_CLOCK   1000000U        ///< Default SWD/JTAG clock frequency in Hz.
+#define DAP_DEFAULT_SWJ_CLOCK   40000U        ///< Default SWD/JTAG clock frequency in Hz.
 
 /// Maximum Package Size for Command and Response data.
 /// This configuration settings is used to optimize the communication performance with the
@@ -409,7 +409,7 @@ __STATIC_FORCEINLINE uint32_t PIN_SWDIO_IN      (void) {
 \param bit Output value for the SWDIO DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE void     PIN_SWDIO_OUT     (uint32_t bit) {
-	HAL_GPIO_WritePin(SWDIO_GPIO_Port, SWDIO_Pin, bit);
+	HAL_GPIO_WritePin(SWDIO_GPIO_Port, SWDIO_Pin, (bit & 1u));
 }
 
 /** SWDIO I/O pin: Switch to Output mode (used in SWD mode only).
