@@ -66,7 +66,7 @@
 #define USBD_LANGID_STRING     1033
 #define USBD_MANUFACTURER_STRING     "STMicroelectronics"
 #define USBD_PID_HS     22352
-#define USBD_PRODUCT_STRING_HS     "STM32 Custom Human interface"
+#define USBD_PRODUCT_STRING_HS     "STM32 Custom Human interface" //TODO add CMSIS DAP to prod string
 #define USBD_CONFIGURATION_STRING_HS     "Custom HID Config"
 #define USBD_INTERFACE_STRING_HS     "Custom HID Interface"
 

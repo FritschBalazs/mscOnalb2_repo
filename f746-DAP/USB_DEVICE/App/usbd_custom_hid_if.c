@@ -147,11 +147,11 @@ extern USBD_HandleTypeDef hUsbDeviceHS;
 
 static int8_t CUSTOM_HID_Init_HS(void);
 static int8_t CUSTOM_HID_DeInit_HS(void);
-static int8_t CUSTOM_HID_OutEvent_HS(uint8_t event_idx, uint8_t state);
+static int8_t CUSTOM_HID_OutEvent_HS(void);
 #ifdef USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED
 static int8_t CUSTOM_HID_CtrlReqComplete_HS(uint8_t request, uint16_t wLength);
 #endif /* USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED */
-static int8_t CUSTOM_HID_InEvent_HS(uint8_t event_idx, uint8_t state);
+static int8_t CUSTOM_HID_InEvent_HS(void);
 
 #ifdef USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED
 static uint8_t *CUSTOM_HID_GetReport_HS(uint16_t *ReportLength);
@@ -212,21 +212,22 @@ static int8_t CUSTOM_HID_DeInit_HS(void)
   * @param  state: Event state
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t CUSTOM_HID_OutEvent_HS(uint8_t event_idx, uint8_t state)
+static int8_t CUSTOM_HID_OutEvent_HS(void)
 {
   /* USER CODE BEGIN 10 */
-  UNUSED(event_idx);
-  UNUSED(state);
-
-    /* Start next USB packet transfer once data processing is completed */
+  /* Start next USB packet transfer once data processing is completed */
   if (USBD_CUSTOM_HID_ReceivePacket(&hUsbDeviceHS) != (uint8_t)USBD_OK)
   {
     return -1;
   }
 
-  USBD_OutEvent();        /* OUTPUT REPORT was received. */
+  USBD_CUSTOM_HID_HandleTypeDef *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)hUsbDeviceHS.pClassData;
+
+  /* OUTPUT REPORT was received, handle the data. */
+  HID0_SetReport(HID_REPORT_OUTPUT, 0, 0, hhid->Report_buf, USBD_CUSTOMHID_OUTREPORT_BUF_SIZE);
 
   return (USBD_OK);
+}
   /* USER CODE END 10 */
 
 #ifdef USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED
@@ -277,11 +278,18 @@ static uint8_t *CUSTOM_HID_GetReport_HS(uint16_t *ReportLength)
 #endif /* USBD_CUSTOMHID_CTRL_REQ_GET_REPORT_ENABLED */
 
 /* USER CODE BEGIN 11 */
-}
-static int8_t CUSTOM_HID_InEvent_HS(uint8_t event_idx, uint8_t state)
+
+static int8_t CUSTOM_HID_InEvent_HS(void)
 {
   /* USER CODE BEGIN extra */
-  USBD_InEvent();       /* INPUT REPORT has been sent */
+  int32_t len;
+
+  USBD_CUSTOM_HID_HandleTypeDef *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)hUsbDeviceHS.pClassData;
+  if ((len=HID0_GetReport(HID_REPORT_INPUT, USBD_HID_REQ_EP_INT, 0, hhid->Report_buf)) > 0)
+  {
+	  HID_Send_Report(&hUsbDeviceHS, hhid->Report_buf, len);
+  }
+
   return (USBD_OK);
   /* USER CODE END extra */
 }

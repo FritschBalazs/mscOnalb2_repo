@@ -103,6 +103,7 @@ int main(void)
 
   //printf("\r\n");
   printf(__DATE__" " __TIME__"\r\n");
+  APP_Setup();
 
   /* USER CODE END 2 */
 

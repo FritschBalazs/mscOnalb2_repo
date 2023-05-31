@@ -4,21 +4,22 @@
  *	Main application code for the CMSIS-DAP probe.
  *
  *  Created on: Apr 15, 2023
- *      Author: frici
+ *      Author: FBalazs
  */
 
 #include "app.h"
 #include "main.h"
 #include "DAP_config.h"
-#include <stdbool.h>
 #include "usbd_customhid.h"
 #include "DAP.h"
+
+#define USB_HID_BUSY_USER_TIMEOUT (2U)
 
 extern USBD_HandleTypeDef hUsbDeviceHS;
 extern PCD_HandleTypeDef hpcd_USB_OTG_HS;
 
-/* I've copied and modified the main functions from LPC-Link2 V1 example from CMSIS-DAP */
-
+/* I've copied and modified the main functions from LPC-Link2 V1 example from CMSIS-DAP.
+ * The following variables are from there. They implement two circular buffers */
 static volatile uint16_t USB_RequestIndexI;     // Request  Index In
 static volatile uint16_t USB_RequestIndexO;     // Request  Index Out
 static volatile uint16_t USB_RequestCountI;     // Request  Count In
@@ -37,12 +38,11 @@ bool REQUEST_FLAG = 0;
 bool BUFFER_FULL_FLAG = 0;
 
 
-
+/* Local function prototypes  */
 void DAP_USB_Initialize (void);
-int32_t HID0_GetReport (uint8_t rtype, uint8_t req, uint8_t rid, uint8_t *buf);
-bool HID0_SetReport (uint8_t rtype, uint8_t req, uint8_t rid, const uint8_t *buf, int32_t len);
-uint8_t HID_Send_Report(USBD_HandleTypeDef *pdev,uint8_t *report, uint16_t len);
 
+
+/* debug variables */
 volatile uint16_t dbg_cntr = 0;
 
 // Called during USBD_Initialize to initialize the USB HID class instance.
@@ -218,68 +218,51 @@ void APP_Run(void){
 
 }
 
-void USBD_InEvent(void){
-	  int32_t len;
 
-	  USBD_CUSTOM_HID_HandleTypeDef *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)hUsbDeviceHS.pClassData;
-	  if ((len=HID0_GetReport(HID_REPORT_INPUT, USBD_HID_REQ_EP_INT, 0, hhid->Report_buf)) > 0)
-	  {
-		  HID_Send_Report(&hUsbDeviceHS, hhid->Report_buf, len);
-	  }
-}
-
-void USBD_OutEvent(void){
-	USBD_CUSTOM_HID_HandleTypeDef *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)hUsbDeviceHS.pClassData;
-	HID0_SetReport(HID_REPORT_OUTPUT, 0, 0, hhid->Report_buf, USBD_CUSTOMHID_OUTREPORT_BUF_SIZE);
-
-}
 
 /* Wrapper for USBD_HID_SendReport(). It checks device state first, and calls remote wakeup if needed
  *
  * based on HID_Standalone wakeup example for f746G disco */
 uint8_t HID_Send_Report(USBD_HandleTypeDef *pdev,uint8_t *report, uint16_t len){
 
-
+/* once remoteWakeUp is supported properly, I will clean this up //TODO remoteWakeup?
 	if ((pdev->dev_remote_wakeup == 1) && (pdev->dev_state == USBD_STATE_SUSPENDED)){
 		if ((&hpcd_USB_OTG_HS)->Init.low_power_enable)
 		{
-			/* Reset SLEEPDEEP bit of Cortex System Control Register */
+			// Reset SLEEPDEEP bit of Cortex System Control Register
 			SCB->SCR &= (uint32_t)~((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));
 
 	        //SystemClockConfig_STOP();
 		}
 
-		/* Ungate PHY clock */
+		// Ungate PHY clock
 		__HAL_PCD_UNGATE_PHYCLOCK((&hpcd_USB_OTG_HS));
 
-		/* Activate Remote wakeup */
+		// Activate Remote wakeup
 		HAL_PCD_ActivateRemoteWakeup((&hpcd_USB_OTG_HS));
 
-		/* Remote wakeup delay */
+		// Remote wakeup delay
 		HAL_Delay(10);
 
-		/* Disable Remote wakeup */
+		// Disable Remote wakeup
 		HAL_PCD_DeActivateRemoteWakeup((&hpcd_USB_OTG_HS));
 
-		/* change state to configured */
+		// change state to configured
 		pdev->dev_state = USBD_STATE_CONFIGURED;
 
-		/* Change remote_wakeup feature to 0*/
+		// Change remote_wakeup feature to 0
 		pdev->dev_remote_wakeup=0;
 		//remotewakeupon = 1;
 
 		printf("Remote wakeup \r\n");
 	}
-
-	USBD_CUSTOM_HID_HandleTypeDef *hhid = hUsbDeviceHS.pClassDataCmsit[hUsbDeviceHS.classId];
-
-
-
-	while(hhid->state != CUSTOM_HID_IDLE){ //TODO find a longterm solution
-	}
+*/
 	
 	if (USBD_CUSTOM_HID_SendReport(pdev, report, len) == CUSTOM_HID_BUSY){
-
+		uint32_t timestamp = HAL_GetTick();
+		while(USBD_CUSTOM_HID_SendReport(pdev, report, len) != USBD_OK && (timestamp + USB_HID_BUSY_USER_TIMEOUT >= HAL_GetTick())){
+			//wait
+		}
 	}
 
 	return 0;

@@ -676,7 +676,7 @@ static uint8_t USBD_CUSTOM_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum)
   /* I added a new interface func in the structure USBD_CUSTOM_HID_ItfTypeDef. */
 
   USBD_CUSTOM_HID_ItfTypeDef * hhid_itf = (pdev->pUserData[0]);
-  hhid_itf->InEvent(hhid->Report_buf[0], hhid->Report_buf[1]);
+  hhid_itf->InEvent();
 
 
   return (uint8_t)USBD_OK;
@@ -692,20 +692,18 @@ static uint8_t USBD_CUSTOM_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum)
 static uint8_t USBD_CUSTOM_HID_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
 {
   UNUSED(epnum);
-  USBD_CUSTOM_HID_HandleTypeDef *hhid;
+
 
   if (pdev->pClassDataCmsit[pdev->classId] == NULL)
   {
     return (uint8_t)USBD_FAIL;
   }
 
-  hhid = (USBD_CUSTOM_HID_HandleTypeDef *)pdev->pClassDataCmsit[pdev->classId];
 
   /* USB data will be immediately processed, this allow next USB traffic being
   NAKed till the end of the application processing */
   USBD_CUSTOM_HID_ItfTypeDef * hhid_itf = (pdev->pUserData[0]);
-  hhid_itf->OutEvent(hhid->Report_buf[0],
-		  	  	     hhid->Report_buf[1]);
+  hhid_itf->OutEvent();
 
   return (uint8_t)USBD_OK;
 }
@@ -758,8 +756,7 @@ static uint8_t USBD_CUSTOM_HID_EP0_RxReady(USBD_HandleTypeDef *pdev)
 
   if (hhid->IsReportAvailable == 1U)
   {
-    ((USBD_CUSTOM_HID_ItfTypeDef *)pdev->pUserData[pdev->classId])->OutEvent(hhid->Report_buf[0],
-                                                                             hhid->Report_buf[1]);
+    ((USBD_CUSTOM_HID_ItfTypeDef *)pdev->pUserData[pdev->classId])->OutEvent();
     hhid->IsReportAvailable = 0U;
   }
 

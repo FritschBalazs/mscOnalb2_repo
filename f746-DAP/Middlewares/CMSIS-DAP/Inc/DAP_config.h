@@ -535,7 +535,7 @@ __STATIC_INLINE void LED_CONNECTED_OUT (uint32_t bit) {
            - 0: Target Running LED OFF: program execution in target stopped.
 */
 __STATIC_INLINE void LED_RUNNING_OUT (uint32_t bit) {
-	HAL_GPIO_WritePin(LED_RUNNING_GPIO_Port, LED_RUNNING_Pin, ~(bit & 1U));
+	HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, ~(bit & 1U));
 }
 
 ///@}
