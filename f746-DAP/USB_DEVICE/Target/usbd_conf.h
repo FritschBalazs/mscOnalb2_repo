@@ -73,14 +73,6 @@
 #define USBD_LPM_ENABLED     0U
 /*---------- -----------*/
 #define USBD_SELF_POWERED     1U
-/*---------- -----------*/
-#define USBD_CUSTOMHID_OUTREPORT_BUF_SIZE     1024U
-//#define USBD_CUSTOMHID_OUTREPORT_BUF_SIZE     64U
-/*---------- -----------*/
-#define USBD_CUSTOM_HID_REPORT_DESC_SIZE     35U  //for packet size=1024
-//#define USBD_CUSTOM_HID_REPORT_DESC_SIZE     32U
-/*---------- -----------*/
-#define CUSTOM_HID_HS_BINTERVAL     0x1U
 
 /****************************************/
 /* #define for FS and HS identification */
