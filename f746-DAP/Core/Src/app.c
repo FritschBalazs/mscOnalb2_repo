@@ -258,9 +258,9 @@ uint8_t HID_Send_Report(USBD_HandleTypeDef *pdev,uint8_t *report, uint16_t len){
 	}
 */
 	
-	if (USBD_CUSTOM_HID_SendReport(pdev, report, len) == CUSTOM_HID_BUSY){
+	if (USBD_CUSTOM_HID_SendReport(pdev, report, len, CUSTOMHID_InstID) == CUSTOM_HID_BUSY){
 		uint32_t timestamp = HAL_GetTick();
-		while(USBD_CUSTOM_HID_SendReport(pdev, report, len) != USBD_OK && (timestamp + USB_HID_BUSY_USER_TIMEOUT >= HAL_GetTick())){
+		while(USBD_CUSTOM_HID_SendReport(pdev, report, len, CUSTOMHID_InstID) != USBD_OK && (timestamp + USB_HID_BUSY_USER_TIMEOUT >= HAL_GetTick())){
 			//wait
 		}
 	}

@@ -36,6 +36,16 @@
 
 /* USER CODE BEGIN INCLUDE */
 
+ /* Activate the IAD option */
+#define USBD_COMPOSITE_USE_IAD                             1U
+
+/* Activate the composite builder */
+#define USE_USBD_COMPOSITE
+
+/* Activate CustomHID and CDC classes in composite builder */
+#define USBD_CMPSIT_ACTIVATE_CUSTOMHID                     1U
+#define USBD_CMPSIT_ACTIVATE_CDC                           1U
+
 /* USER CODE END INCLUDE */
 
 /** @addtogroup USBD_OTG_DRIVER
@@ -62,7 +72,7 @@
   */
 
 /*---------- -----------*/
-#define USBD_MAX_NUM_INTERFACES     1U
+#define USBD_MAX_NUM_INTERFACES     3U
 /*---------- -----------*/
 #define USBD_MAX_NUM_CONFIGURATION     1U
 /*---------- -----------*/

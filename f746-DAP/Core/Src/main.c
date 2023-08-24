@@ -21,12 +21,17 @@
 #include "dma.h"
 #include "tim.h"
 #include "usart.h"
-#include "usb_device.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app.h"
+#include "usbd_cdc.h"
+#include "usbd_customhid.h"
+#include "usbd_composite_builder.h"
+#include "usbd_desc.h"
+#include "usbd_custom_hid_if.h"
+#include "usbd_cdc_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,6 +52,13 @@
 
 /* USER CODE BEGIN PV */
 
+/* USB Device Core handle declaration. */
+USBD_HandleTypeDef hUsbDeviceHS;
+
+uint8_t CDC_InstID, CUSTOMHID_InstID = 0;
+
+uint8_t CustomHID_EpAdress[2] = {CUSTOM_HID_EPIN_ADDR, CUSTOM_HID_EPOUT_ADDR};  /* CustomHID Endpoint Adress */
+uint8_t CDC_EpAdress[3] = {CDC_IN_EP, CDC_OUT_EP, CDC_CMD_EP};  /* CDC Endpoint Adress */
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -94,10 +106,46 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
-  MX_USB_DEVICE_Init();
   MX_DMA_Init();
   MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
+
+  /* Init Device Library, add supported class and start the library. */
+  if (USBD_Init(&hUsbDeviceHS, &HS_Desc, DEVICE_HS) != USBD_OK)
+  {
+	  Error_Handler();
+  }
+
+  /* Store Custom HID instance Class ID */
+  CUSTOMHID_InstID = hUsbDeviceHS.classId;
+
+  /* Register the Custom HID  class */
+  USBD_RegisterClassComposite(&hUsbDeviceHS, USBD_CUSTOM_HID_CLASS, CLASS_TYPE_CHID, CustomHID_EpAdress);
+
+  /* Store CDC instance Class ID */
+  CDC_InstID = hUsbDeviceHS.classId;
+
+  /* Register CDC class first instance */
+  USBD_RegisterClassComposite(&hUsbDeviceHS, USBD_CDC_CLASS, CLASS_TYPE_CDC, CDC_EpAdress);
+
+
+  /* Add Custom HID Interface Class */
+  if (USBD_CMPSIT_SetClassID(&hUsbDeviceHS, CLASS_TYPE_CHID, 0) != 0xFF)
+  {
+    USBD_CUSTOM_HID_RegisterInterface(&hUsbDeviceHS, &USBD_CustomHID_fops_HS);
+  }
+
+    /* Add CDC Interface Class */
+  if (USBD_CMPSIT_SetClassID(&hUsbDeviceHS, CLASS_TYPE_CDC, 0) != 0xFF)
+  {
+    USBD_CDC_RegisterInterface(&hUsbDeviceHS, &USBD_CDC_fops_HS);
+  }
+
+  if (USBD_Start(&hUsbDeviceHS) != USBD_OK)
+  {
+	  Error_Handler();
+  }
+
   HAL_TIM_Base_Start(&htim14);
 
 

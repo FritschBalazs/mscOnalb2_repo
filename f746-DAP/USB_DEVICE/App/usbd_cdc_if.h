@@ -90,7 +90,7 @@
   */
 
 /** CDC Interface callback. */
-extern USBD_CDC_ItfTypeDef USBD_Interface_fops_HS;
+extern USBD_CDC_ItfTypeDef USBD_CDC_fops_HS;
 
 /* USER CODE BEGIN EXPORTED_VARIABLES */
 
