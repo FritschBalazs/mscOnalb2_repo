@@ -21,7 +21,7 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-
+#include "circ_buf.h"
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart1;
@@ -161,5 +161,14 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 }
 
 /* USER CODE BEGIN 1 */
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart){
+	if(huart -> Instance == huart1.Instance){
 
+		if(!cbuf_isEmpty_u8(&printf_buf)){
+			uint8_t c;
+			cbuf_pop_u8(&printf_buf, &c);
+			HAL_UART_Transmit( &huart1,  &c,  1,1);
+		}
+	}
+}
 /* USER CODE END 1 */

@@ -32,6 +32,7 @@
 #include "usbd_desc.h"
 #include "usbd_custom_hid_if.h"
 #include "usbd_cdc_if.h"
+#include "circ_buf.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -69,11 +70,25 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-int _write(int file, char *ptr, int len)
-{
-	HAL_UART_Transmit_IT( &huart1,  (uint8_t *) ptr,  len);
+int __io_putchar(int ch){
+	if (cbuf_isFull_u8(&printf_buf)){
+		return 0;
+	}
 
-	return len;
+	if (cbuf_push_u8(&printf_buf, ch) != 0){
+		return 0;
+	}
+
+	HAL_NVIC_DisableIRQ(USART1_IRQn);
+	if (HAL_UART_GetState(&huart1) == HAL_UART_STATE_READY || !cbuf_isEmpty_u8(&printf_buf)){
+		uint8_t c;
+		cbuf_pop_u8(&printf_buf, &c);
+		HAL_UART_Transmit( &huart1,  &c,  1,1);
+	}
+	HAL_NVIC_EnableIRQ(USART1_IRQn);
+
+
+	return 1;
 }
 /* USER CODE END 0 */
 
@@ -110,38 +125,46 @@ int main(void)
   MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
 
+  /* init circular buffers */
+  cbuf_init_ALL();
+
   /* Init Device Library, add supported class and start the library. */
   if (USBD_Init(&hUsbDeviceHS, &HS_Desc, DEVICE_HS) != USBD_OK)
   {
 	  Error_Handler();
   }
 
-  /* Store Custom HID instance Class ID */
-  CUSTOMHID_InstID = hUsbDeviceHS.classId;
-
-  /* Register the Custom HID  class */
-  USBD_RegisterClassComposite(&hUsbDeviceHS, USBD_CUSTOM_HID_CLASS, CLASS_TYPE_CHID, CustomHID_EpAdress);
+  //debug
+  USBD_StatusTypeDef retval;
 
   /* Store CDC instance Class ID */
   CDC_InstID = hUsbDeviceHS.classId;
 
   /* Register CDC class first instance */
-  USBD_RegisterClassComposite(&hUsbDeviceHS, USBD_CDC_CLASS, CLASS_TYPE_CDC, CDC_EpAdress);
+  retval = USBD_RegisterClassComposite(&hUsbDeviceHS, USBD_CDC_CLASS, CLASS_TYPE_CDC, CDC_EpAdress);
+
+  /* Store Custom HID instance Class ID */
+  CUSTOMHID_InstID = hUsbDeviceHS.classId;
+
+  /* Register the Custom HID  class */
+  retval = USBD_RegisterClassComposite(&hUsbDeviceHS, USBD_CUSTOM_HID_CLASS, CLASS_TYPE_CHID, CustomHID_EpAdress);
+
 
 
   /* Add Custom HID Interface Class */
   if (USBD_CMPSIT_SetClassID(&hUsbDeviceHS, CLASS_TYPE_CHID, 0) != 0xFF)
   {
-    USBD_CUSTOM_HID_RegisterInterface(&hUsbDeviceHS, &USBD_CustomHID_fops_HS);
+	  retval = USBD_CUSTOM_HID_RegisterInterface(&hUsbDeviceHS, &USBD_CustomHID_fops_HS);
   }
 
     /* Add CDC Interface Class */
   if (USBD_CMPSIT_SetClassID(&hUsbDeviceHS, CLASS_TYPE_CDC, 0) != 0xFF)
   {
-    USBD_CDC_RegisterInterface(&hUsbDeviceHS, &USBD_CDC_fops_HS);
+    retval = USBD_CDC_RegisterInterface(&hUsbDeviceHS, &USBD_CDC_fops_HS);
   }
 
-  if (USBD_Start(&hUsbDeviceHS) != USBD_OK)
+  retval = USBD_Start(&hUsbDeviceHS);
+  if ( retval != USBD_OK)
   {
 	  Error_Handler();
   }

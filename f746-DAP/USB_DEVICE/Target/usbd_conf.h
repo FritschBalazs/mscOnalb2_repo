@@ -42,6 +42,9 @@
 /* Activate the composite builder */
 #define USE_USBD_COMPOSITE
 
+/* Notify composite builder that we use HS */
+#define USE_USB_HS
+
 /* Activate CustomHID and CDC classes in composite builder */
 #define USBD_CMPSIT_ACTIVATE_CUSTOMHID                     1U
 #define USBD_CMPSIT_ACTIVATE_CDC                           1U
@@ -78,7 +81,7 @@
 /*---------- -----------*/
 #define USBD_MAX_STR_DESC_SIZ     512U
 /*---------- -----------*/
-#define USBD_DEBUG_LEVEL     0U
+#define USBD_DEBUG_LEVEL     3U
 /*---------- -----------*/
 #define USBD_LPM_ENABLED     0U
 /*---------- -----------*/
@@ -119,7 +122,7 @@
 
 #if (USBD_DEBUG_LEVEL > 0)
 #define USBD_UsrLog(...)    printf(__VA_ARGS__);\
-                            printf("\n");
+                            printf("\r\n");
 #else
 #define USBD_UsrLog(...)
 #endif
@@ -128,7 +131,7 @@
 
 #define USBD_ErrLog(...)    printf("ERROR: ") ;\
                             printf(__VA_ARGS__);\
-                            printf("\n");
+                            printf("\r\n");
 #else
 #define USBD_ErrLog(...)
 #endif
@@ -136,7 +139,7 @@
 #if (USBD_DEBUG_LEVEL > 2)
 #define USBD_DbgLog(...)    printf("DEBUG : ") ;\
                             printf(__VA_ARGS__);\
-                            printf("\n");
+                            printf("\r\n");
 #else
 #define USBD_DbgLog(...)
 #endif
