@@ -675,7 +675,7 @@ static uint8_t USBD_CUSTOM_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum)
 
   /* I added a new interface func in the structure USBD_CUSTOM_HID_ItfTypeDef. */
 
-  USBD_CUSTOM_HID_ItfTypeDef * hhid_itf = (pdev->pUserData[0]);
+  USBD_CUSTOM_HID_ItfTypeDef * hhid_itf = (pdev->pUserData[CUSTOMHID_InstID]);
   hhid_itf->InEvent();
 
 
@@ -702,7 +702,7 @@ static uint8_t USBD_CUSTOM_HID_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
 
   /* USB data will be immediately processed, this allow next USB traffic being
   NAKed till the end of the application processing */
-  USBD_CUSTOM_HID_ItfTypeDef * hhid_itf = (pdev->pUserData[0]);
+  USBD_CUSTOM_HID_ItfTypeDef * hhid_itf = (pdev->pUserData[CUSTOMHID_InstID]);
   hhid_itf->OutEvent();
 
   return (uint8_t)USBD_OK;

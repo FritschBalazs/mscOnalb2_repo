@@ -137,11 +137,7 @@ int main(void)
   //debug
   USBD_StatusTypeDef retval;
 
-  /* Store CDC instance Class ID */
-  CDC_InstID = hUsbDeviceHS.classId;
 
-  /* Register CDC class first instance */
-  retval = USBD_RegisterClassComposite(&hUsbDeviceHS, USBD_CDC_CLASS, CLASS_TYPE_CDC, CDC_EpAdress);
 
   /* Store Custom HID instance Class ID */
   CUSTOMHID_InstID = hUsbDeviceHS.classId;
@@ -149,7 +145,11 @@ int main(void)
   /* Register the Custom HID  class */
   retval = USBD_RegisterClassComposite(&hUsbDeviceHS, USBD_CUSTOM_HID_CLASS, CLASS_TYPE_CHID, CustomHID_EpAdress);
 
+  /* Store CDC instance Class ID */
+  CDC_InstID = hUsbDeviceHS.classId;
 
+  /* Register CDC class first instance */
+  retval = USBD_RegisterClassComposite(&hUsbDeviceHS, USBD_CDC_CLASS, CLASS_TYPE_CDC, CDC_EpAdress);
 
   /* Add Custom HID Interface Class */
   if (USBD_CMPSIT_SetClassID(&hUsbDeviceHS, CLASS_TYPE_CHID, 0) != 0xFF)
@@ -157,10 +157,10 @@ int main(void)
 	  retval = USBD_CUSTOM_HID_RegisterInterface(&hUsbDeviceHS, &USBD_CustomHID_fops_HS);
   }
 
-    /* Add CDC Interface Class */
+  /* Add CDC Interface Class */
   if (USBD_CMPSIT_SetClassID(&hUsbDeviceHS, CLASS_TYPE_CDC, 0) != 0xFF)
   {
-    retval = USBD_CDC_RegisterInterface(&hUsbDeviceHS, &USBD_CDC_fops_HS);
+	  retval = USBD_CDC_RegisterInterface(&hUsbDeviceHS, &USBD_CDC_fops_HS);
   }
 
   retval = USBD_Start(&hUsbDeviceHS);

@@ -221,7 +221,7 @@ static int8_t CUSTOM_HID_OutEvent_HS(void)
     return -1;
   }
 
-  USBD_CUSTOM_HID_HandleTypeDef *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)hUsbDeviceHS.pClassData;
+  USBD_CUSTOM_HID_HandleTypeDef *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)hUsbDeviceHS.pClassDataCmsit[CUSTOMHID_InstID];
 
   /* OUTPUT REPORT was received, handle the data. */
   HID0_SetReport(HID_REPORT_OUTPUT, 0, 0, hhid->Report_buf, USBD_CUSTOMHID_OUTREPORT_BUF_SIZE);
@@ -284,7 +284,7 @@ static int8_t CUSTOM_HID_InEvent_HS(void)
   /* USER CODE BEGIN extra */
   int32_t len;
 
-  USBD_CUSTOM_HID_HandleTypeDef *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)hUsbDeviceHS.pClassData;
+  USBD_CUSTOM_HID_HandleTypeDef *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)hUsbDeviceHS.pClassDataCmsit[CUSTOMHID_InstID];
   if ((len=HID0_GetReport(HID_REPORT_INPUT, USBD_HID_REQ_EP_INT, 0, hhid->Report_buf)) > 0)
   {
 	  HID_Send_Report(&hUsbDeviceHS, hhid->Report_buf, len);
