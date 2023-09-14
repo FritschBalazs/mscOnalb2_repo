@@ -41,13 +41,13 @@ extern "C" {
   * @{
   */
 #ifndef CDC_IN_EP
-#define CDC_IN_EP                                   0x82U  /* EP1 for data IN */
+#define CDC_IN_EP                                   0x81U  /* EP1 for data IN */
 #endif /* CDC_IN_EP */
 #ifndef CDC_OUT_EP
-#define CDC_OUT_EP                                  0x02U  /* EP1 for data OUT */
+#define CDC_OUT_EP                                  0x01U  /* EP1 for data OUT */
 #endif /* CDC_OUT_EP */
 #ifndef CDC_CMD_EP
-#define CDC_CMD_EP                                  0x83U  /* EP2 for CDC commands */
+#define CDC_CMD_EP                                  0x82U  /* EP2 for CDC commands */
 #endif /* CDC_CMD_EP  */
 
 #ifndef CDC_HS_BINTERVAL
@@ -59,7 +59,7 @@ extern "C" {
 #endif /* CDC_FS_BINTERVAL */
 
 /* CDC Endpoints parameters: you can fine tune these values depending on the needed baudrates and performance. */
-#define CDC_DATA_HS_MAX_PACKET_SIZE                 512U  /* Endpoint IN & OUT Packet size */
+#define CDC_DATA_HS_MAX_PACKET_SIZE                 64U  /* Endpoint IN & OUT Packet size */
 #define CDC_DATA_FS_MAX_PACKET_SIZE                 64U  /* Endpoint IN & OUT Packet size */
 #define CDC_CMD_PACKET_SIZE                         8U  /* Control Endpoint Packet size */
 

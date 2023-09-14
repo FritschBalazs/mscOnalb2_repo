@@ -12,6 +12,7 @@
 #include "DAP_config.h"
 #include "usbd_customhid.h"
 #include "DAP.h"
+#include "usbd_cdc_if.h"
 
 #define USB_HID_BUSY_USER_TIMEOUT (2U)
 
@@ -149,6 +150,11 @@ bool HID0_SetReport (uint8_t rtype, uint8_t req, uint8_t rid, const uint8_t *buf
   return true;
 }
 
+// just for test
+uint32_t cnt = 0;
+uint8_t text[CDC_DATA_HS_MAX_PACKET_SIZE] = {"Hello \r\n"};
+uint8_t enable_send = 1;
+
 /* Modified DAP thread from the example */
 void APP_Run(void){
 	uint32_t n;
@@ -212,6 +218,14 @@ void APP_Run(void){
 			  HID_Send_Report(&hUsbDeviceHS, USB_Response[n], DAP_PACKET_SIZE);
 			}
 		  }
+		}
+	}
+
+	cnt++;
+	if (cnt>=10000000){
+		cnt = 0;
+		if (enable_send){
+			CDC_Transmit_HS(&text, sizeof(text));
 		}
 	}
 
