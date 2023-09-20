@@ -20,13 +20,49 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_core.h"
-#include "usbd_hid.h" /* Include class header file */
+#include "usb_otg.h"
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+#define EP_ADDR_7F_MSK (0x7Fu)
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
+static USBD_StatusTypeDef USBD_Get_USB_Status(HAL_StatusTypeDef hal_status);
+
+/**
+  * @brief  Returns the USB status depending on the HAL status:
+  * @param  hal_status: HAL status
+  * @retval USB status
+  */
+USBD_StatusTypeDef USBD_Get_USB_Status(HAL_StatusTypeDef hal_status)
+{
+  USBD_StatusTypeDef usb_status = USBD_OK;
+
+  switch (hal_status)
+  {
+    case HAL_OK :
+      usb_status = USBD_OK;
+    break;
+    case HAL_ERROR :
+      usb_status = USBD_FAIL;
+    break;
+    case HAL_BUSY :
+      usb_status = USBD_BUSY;
+    break;
+    case HAL_TIMEOUT :
+      usb_status = USBD_FAIL;
+    break;
+    default :
+      usb_status = USBD_FAIL;
+    break;
+  }
+  return usb_status;
+}
+
+
 /* Private functions ---------------------------------------------------------*/
+
+
 /**
   * @brief  Initializes the Low Level portion of the Device driver.
   * @param  pdev: Device handle
@@ -34,7 +70,15 @@
   */
 USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
 {
-  UNUSED(pdev);
+  /* link HAL level and "middleware" handles */
+  hpcd_USB_OTG_HS.pData = pdev;
+  pdev->pData = &hpcd_USB_OTG_HS; //TODO cmpst: pData? modify?
+
+
+  /* Assign HW FIFO to endpoints. F746 has 4kB for HS */
+  HAL_PCDEx_SetRxFiFo(&hpcd_USB_OTG_HS, 1024 / 4); /* supposedly sets all TX fifos? */
+  HAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_HS, 0, 1024 / 4);
+  HAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_HS, 1, 1024 / 2);
 
   return USBD_OK;
 }
@@ -46,9 +90,8 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
   */
 USBD_StatusTypeDef USBD_LL_DeInit(USBD_HandleTypeDef *pdev)
 {
-  UNUSED(pdev);
-
-  return USBD_OK;
+  HAL_StatusTypeDef const hal_status = HAL_PCD_DeInit(pdev->pData);
+  return USBD_Get_USB_Status(hal_status);
 }
 
 /**
@@ -58,9 +101,8 @@ USBD_StatusTypeDef USBD_LL_DeInit(USBD_HandleTypeDef *pdev)
   */
 USBD_StatusTypeDef USBD_LL_Start(USBD_HandleTypeDef *pdev)
 {
-  UNUSED(pdev);
-
-  return USBD_OK;
+  HAL_StatusTypeDef const hal_status = HAL_PCD_Start(pdev->pData);
+  return USBD_Get_USB_Status(hal_status);
 }
 
 /**
@@ -70,9 +112,8 @@ USBD_StatusTypeDef USBD_LL_Start(USBD_HandleTypeDef *pdev)
   */
 USBD_StatusTypeDef USBD_LL_Stop(USBD_HandleTypeDef *pdev)
 {
-  UNUSED(pdev);
-
-  return USBD_OK;
+  HAL_StatusTypeDef const hal_status = HAL_PCD_Stop(pdev->pData);
+  return USBD_Get_USB_Status(hal_status);
 }
 
 /**
@@ -86,12 +127,12 @@ USBD_StatusTypeDef USBD_LL_Stop(USBD_HandleTypeDef *pdev)
 USBD_StatusTypeDef USBD_LL_OpenEP(USBD_HandleTypeDef *pdev, uint8_t ep_addr,
                                   uint8_t ep_type, uint16_t ep_mps)
 {
-  UNUSED(pdev);
-  UNUSED(ep_addr);
-  UNUSED(ep_type);
-  UNUSED(ep_mps);
 
-  return USBD_OK;
+  HAL_StatusTypeDef const hal_status = HAL_PCD_EP_Open(pdev->pData, ep_addr, ep_mps, ep_type); //TODO cmpst: pData! modify
+
+  /* set endpoint flag */
+  pdev->ep_in[ep_addr & EP_ADDR_7F_MSK].is_used = 1;
+  return USBD_Get_USB_Status(hal_status);
 }
 
 /**
@@ -102,10 +143,10 @@ USBD_StatusTypeDef USBD_LL_OpenEP(USBD_HandleTypeDef *pdev, uint8_t ep_addr,
   */
 USBD_StatusTypeDef USBD_LL_CloseEP(USBD_HandleTypeDef *pdev, uint8_t ep_addr)
 {
-  UNUSED(pdev);
-  UNUSED(ep_addr);
 
-  return USBD_OK;
+  HAL_StatusTypeDef const hal_status = HAL_PCD_EP_Close(pdev->pData, ep_addr); //TODO cmpst: pData! modify
+
+  return hal_status;
 }
 
 /**
@@ -116,10 +157,10 @@ USBD_StatusTypeDef USBD_LL_CloseEP(USBD_HandleTypeDef *pdev, uint8_t ep_addr)
   */
 USBD_StatusTypeDef USBD_LL_FlushEP(USBD_HandleTypeDef *pdev, uint8_t ep_addr)
 {
-  UNUSED(pdev);
-  UNUSED(ep_addr);
 
-  return USBD_OK;
+  HAL_StatusTypeDef const hal_status = HAL_PCD_EP_Flush(pdev->pData,ep_addr);
+  return USBD_Get_USB_Status(hal_status);
+
 }
 
 /**
@@ -130,8 +171,8 @@ USBD_StatusTypeDef USBD_LL_FlushEP(USBD_HandleTypeDef *pdev, uint8_t ep_addr)
   */
 USBD_StatusTypeDef USBD_LL_StallEP(USBD_HandleTypeDef *pdev, uint8_t ep_addr)
 {
-  UNUSED(pdev);
-  UNUSED(ep_addr);
+  HAL_StatusTypeDef const hal_status = HAL_PCD_EP_SetStall(pdev->pData,ep_addr);
+  return USBD_Get_USB_Status(hal_status);
 
   return USBD_OK;
 }
@@ -145,10 +186,8 @@ USBD_StatusTypeDef USBD_LL_StallEP(USBD_HandleTypeDef *pdev, uint8_t ep_addr)
 USBD_StatusTypeDef USBD_LL_ClearStallEP(USBD_HandleTypeDef *pdev,
                                         uint8_t ep_addr)
 {
-  UNUSED(pdev);
-  UNUSED(ep_addr);
-
-  return USBD_OK;
+  HAL_StatusTypeDef const hal_status = HAL_PCD_EP_ClrStall(pdev->pData,ep_addr);
+  return USBD_Get_USB_Status(hal_status);
 }
 
 /**
@@ -159,10 +198,10 @@ USBD_StatusTypeDef USBD_LL_ClearStallEP(USBD_HandleTypeDef *pdev,
   */
 uint8_t USBD_LL_IsStallEP(USBD_HandleTypeDef *pdev, uint8_t ep_addr)
 {
-  UNUSED(pdev);
-  UNUSED(ep_addr);
+  PCD_HandleTypeDef const *hpcd = pdev->pData;
+  return ep_addr & 0x80 ? hpcd->IN_ep[ep_addr & EP_ADDR_7F_MSK].is_stall :  /*highest bit decides if it's in our out ep */
+		  	  	  	  	  hpcd->OUT_ep[ep_addr & EP_ADDR_7F_MSK].is_stall;
 
-  return 0U;
 }
 
 /**
@@ -174,10 +213,8 @@ uint8_t USBD_LL_IsStallEP(USBD_HandleTypeDef *pdev, uint8_t ep_addr)
 USBD_StatusTypeDef USBD_LL_SetUSBAddress(USBD_HandleTypeDef *pdev,
                                          uint8_t dev_addr)
 {
-  UNUSED(pdev);
-  UNUSED(dev_addr);
-
-  return USBD_OK;
+  HAL_StatusTypeDef const hal_status = HAL_PCD_SetAddress(pdev->pData,dev_addr);
+  return USBD_Get_USB_Status(hal_status);
 }
 
 /**
@@ -191,12 +228,9 @@ USBD_StatusTypeDef USBD_LL_SetUSBAddress(USBD_HandleTypeDef *pdev,
 USBD_StatusTypeDef USBD_LL_Transmit(USBD_HandleTypeDef *pdev, uint8_t ep_addr,
                                     uint8_t *pbuf, uint32_t size)
 {
-  UNUSED(pdev);
-  UNUSED(ep_addr);
-  UNUSED(pbuf);
-  UNUSED(size);
+  HAL_StatusTypeDef const hal_status = HAL_PCD_EP_Transmit(pdev->pData,ep_addr, pbuf, size);
+  return USBD_Get_USB_Status(hal_status);
 
-  return USBD_OK;
 }
 
 /**
@@ -211,12 +245,8 @@ USBD_StatusTypeDef USBD_LL_PrepareReceive(USBD_HandleTypeDef *pdev,
                                           uint8_t ep_addr, uint8_t *pbuf,
                                           uint32_t size)
 {
-  UNUSED(pdev);
-  UNUSED(ep_addr);
-  UNUSED(pbuf);
-  UNUSED(size);
-
-  return USBD_OK;
+  HAL_StatusTypeDef const hal_status = HAL_PCD_EP_Receive(pdev->pData,ep_addr, pbuf, size);
+  return USBD_Get_USB_Status(hal_status);
 }
 
 /**
@@ -227,10 +257,8 @@ USBD_StatusTypeDef USBD_LL_PrepareReceive(USBD_HandleTypeDef *pdev,
   */
 uint32_t USBD_LL_GetRxDataSize(USBD_HandleTypeDef *pdev, uint8_t ep_addr)
 {
-  UNUSED(pdev);
-  UNUSED(ep_addr);
+  return HAL_PCD_EP_GetRxCount(pdev->pData, ep_addr);
 
-  return 0U;
 }
 
 #ifdef USBD_HS_TESTMODE_ENABLE
@@ -277,6 +305,6 @@ void USBD_static_free(void *p)
   */
 void USBD_LL_Delay(uint32_t Delay)
 {
-  UNUSED(Delay);
+  HAL_Delay(Delay);
 }
 

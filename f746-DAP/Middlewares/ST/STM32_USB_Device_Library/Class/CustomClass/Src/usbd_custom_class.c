@@ -36,8 +36,8 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "usbd_template.h"
 #include "usbd_ctlreq.h"
+#include "../Inc/usbd_custom_class.h"
 
 
 /** @addtogroup STM32_USB_DEVICE_LIBRARY
