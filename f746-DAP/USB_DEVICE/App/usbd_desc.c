@@ -26,15 +26,15 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 #define USBD_VID                      0x0483
-#define USBD_PID                      0xaaaa  /* Replace '0xaaaa' with your device product ID */
-#define USBD_LANGID_STRING            0xbbb   /* Replace '0xbbb' with your device language ID */
-#define USBD_MANUFACTURER_STRING      "xxxxx" /* Add your manufacturer string */
-#define USBD_PRODUCT_HS_STRING        "xxxxx" /* Add your product High Speed string */
-#define USBD_PRODUCT_FS_STRING        "xxxxx" /* Add your product Full Speed string */
-#define USBD_CONFIGURATION_HS_STRING  "xxxxx" /* Add your configuration High Speed string */
-#define USBD_INTERFACE_HS_STRING      "xxxxx" /* Add your Interface High Speed string */
-#define USBD_CONFIGURATION_FS_STRING  "xxxxx" /* Add your configuration Full Speed string */
-#define USBD_INTERFACE_FS_STRING      "xxxxx" /* Add your Interface Full Speed string */
+#define USBD_PID                      0x0108  								/* Random Product ID not used by ST */
+#define USBD_LANGID_STRING            0x0409  								/* English (US) */
+#define USBD_MANUFACTURER_STRING      "FB" 									/* Add your manufacturer string */
+#define USBD_PRODUCT_HS_STRING        "CMSIS-DAP w/ bulk EPs" 				/* Add your product High Speed string */
+#define USBD_PRODUCT_FS_STRING        "CMSIS-DAP w/ bulk EPs FS" 			/* Add your product Full Speed string */
+#define USBD_CONFIGURATION_HS_STRING  "Config 1 HS" 						/* Add your configuration High Speed string */
+#define USBD_INTERFACE_HS_STRING      "Tripple bulk EPs, no composite" 		/* Add your Interface High Speed string */
+#define USBD_CONFIGURATION_FS_STRING  "Config 1 FS" 						/* Add your configuration Full Speed string */
+#define USBD_INTERFACE_FS_STRING      "Tripple bulk EPs, no composite FS" 	/* Add your Interface Full Speed string */
 
 /* Private macro -------------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
@@ -88,7 +88,7 @@ __ALIGN_BEGIN uint8_t USBD_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
   0x00,                       /* bcdUSB */
 #endif /* (USBD_LPM_ENABLED == 1) || (USBD_CLASS_BOS_ENABLED == 1) */
   0x02,
-  0x00,                       /* bDeviceClass */
+  0xFF,						  /* bDeviceClass: vendor specific */
   0x00,                       /* bDeviceSubClass */
   0x00,                       /* bDeviceProtocol */
   USB_MAX_EP0_SIZE,           /* bMaxPacketSize */
