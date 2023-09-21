@@ -26,10 +26,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "app.h"
 #include "usbd_core.h"
 #include "usbd_desc.h"
 #include "usbd_custom_class.h"
+#include "app.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,7 +50,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-USBD_HandleTypeDef hUsbDeviceFS;
+USBD_HandleTypeDef hUsbDeviceHS;
+extern PCD_HandleTypeDef hpcd_USB_OTG_HS;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -103,14 +106,13 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim14);
 
-  printf("CMSIS-DAP by Frici, bulk mode\r\n" );
-  printf("Build: "__DATE__" " __TIME__"\r\n");
+  printf("CMSIS-DAP by Frici, bulk mode \r\n Build: "__DATE__" " __TIME__"\r\n");
 
-  HAL_GPIO_WritePin(LCD_BL_CTRL_GPIO_Port, LCD_BL_CTRL_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(LCD_BL_CTRL_GPIO_Port, LCD_BL_CTRL_Pin, GPIO_PIN_RESET);
 
-  USBD_Init(&hUsbDeviceFS, &Class_Desc, 0);
-  USBD_RegisterClass(&hUsbDeviceFS, &USBD_TEMPLATE_ClassDriver);
-  USBD_Start(&hUsbDeviceFS);
+  USBD_Init(&hUsbDeviceHS, &Class_Desc, 0);
+  USBD_RegisterClass(&hUsbDeviceHS, &USBD_TEMPLATE_ClassDriver);
+  USBD_Start(&hUsbDeviceHS);
 
   APP_Setup();
 

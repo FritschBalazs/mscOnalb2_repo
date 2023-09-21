@@ -76,9 +76,10 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
 
 
   /* Assign HW FIFO to endpoints. F746 has 4kB for HS */
-  HAL_PCDEx_SetRxFiFo(&hpcd_USB_OTG_HS, 1024 / 4); /* supposedly sets all TX fifos? */
+  HAL_PCDEx_SetRxFiFo(&hpcd_USB_OTG_HS, 1024 / 4); /* supposedly sets all RX fifos? */
   HAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_HS, 0, 1024 / 4);
-  HAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_HS, 1, 1024 / 2);
+  HAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_HS, 1, 1024 / 4);
+  HAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_HS, 1, 1024 / 4);
 
   return USBD_OK;
 }
@@ -284,7 +285,7 @@ USBD_StatusTypeDef USBD_LL_SetTestMode(USBD_HandleTypeDef *pdev, uint8_t testmod
   */
 void *USBD_static_malloc(uint32_t size)
 {
-  static uint32_t mem[(sizeof(USBD_HID_HandleTypeDef) / 4) + 1]; /* On 32-bit boundary */
+  static uint32_t mem[(sizeof(USBD_HandleTypeDef) / 4) + 1]; /* On 32-bit boundary */ //TODO ez mi?
   return mem;
 }
 
@@ -339,7 +340,7 @@ void HAL_PCD_DataInStageCallback(PCD_HandleTypeDef *hpcd, uint8_t epnum)
   */
 void HAL_PCD_SetupStageCallback(PCD_HandleTypeDef *hpcd)
 {
-  USBD_LL_SetupStage(hpcd->pData, hpcd->Setup);
+  USBD_LL_SetupStage(hpcd->pData, (uint8_t*)hpcd->Setup); //TODO check if cast is good
 }
 
 /**

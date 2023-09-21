@@ -65,7 +65,7 @@ USBD_DescriptorsTypeDef Class_Desc =
   USBD_Class_ConfigStrDescriptor,
   USBD_Class_InterfaceStrDescriptor,
 #if (USBD_CLASS_USER_STRING_DESC == 1)
-  USBD_CLASS_UserStrDescriptor,
+  USBD_Class_UserStrDescriptor,
 #endif /* USB_CLASS_USER_STRING_DESC */
 
 #if ((USBD_LPM_ENABLED == 1) || (USBD_CLASS_BOS_ENABLED == 1))
@@ -416,7 +416,7 @@ uint8_t *USBD_USR_BOSDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
   */
 uint8_t *USBD_Class_UserStrDescriptor(USBD_SpeedTypeDef speed, uint8_t idx, uint16_t *length)
 {
-  static uint8_t USBD_StrDesc[255];
+  static uint8_t USBD_StrDesc[255];   //TODO this is probably useless in this form
 
   return USBD_StrDesc;
 }
