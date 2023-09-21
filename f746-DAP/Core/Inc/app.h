@@ -9,7 +9,7 @@
 #define INC_APP_H_
 
 #include "main.h"
-#include "usbd_customhid.h"
+#include "usbd_custom_class.h"
 
 enum USBD_HID_REQ_t {
 	USBD_HID_REQ_EP_CTRL = 0,

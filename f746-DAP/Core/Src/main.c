@@ -27,6 +27,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app.h"
+#include "usbd_core.h"
+#include "usbd_desc.h"
+#include "usbd_custom_class.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,7 +49,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+USBD_HandleTypeDef hUsbDeviceFS;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -100,9 +103,15 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim14);
 
+  printf("CMSIS-DAP by Frici, bulk mode\r\n" );
+  printf("Build: "__DATE__" " __TIME__"\r\n");
 
-  //printf("\r\n");
-  printf(__DATE__" " __TIME__"\r\n");
+  HAL_GPIO_WritePin(LCD_BL_CTRL_GPIO_Port, LCD_BL_CTRL_Pin, GPIO_PIN_SET);
+
+  USBD_Init(&hUsbDeviceFS, &Class_Desc, 0);
+  USBD_RegisterClass(&hUsbDeviceFS, &USBD_TEMPLATE_ClassDriver);
+  USBD_Start(&hUsbDeviceFS);
+
   APP_Setup();
 
   /* USER CODE END 2 */

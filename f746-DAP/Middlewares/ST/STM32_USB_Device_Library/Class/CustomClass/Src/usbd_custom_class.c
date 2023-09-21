@@ -37,8 +37,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_ctlreq.h"
-#include "../Inc/usbd_custom_class.h"
-
+#include "usbd_custom_class.h"
 
 /** @addtogroup STM32_USB_DEVICE_LIBRARY
   * @{
@@ -126,19 +125,57 @@ USBD_ClassTypeDef USBD_TEMPLATE_ClassDriver =
 #pragma data_alignment=4
 #endif /* __ICCARM__ */
 /* USB TEMPLATE device Configuration Descriptor */
-__ALIGN_BEGIN static uint8_t USBD_TEMPLATE_CfgDesc[USB_TEMPLATE_CONFIG_DESC_SIZ] __ALIGN_END =
+__ALIGN_BEGIN static uint8_t USBD_TEMPLATE_CfgDesc[USB_CONFIG_DESC_SIZ] __ALIGN_END =
 {
   0x09, /* bLength: Configuration Descriptor size */
-  USB_DESC_TYPE_OTHER_SPEED_CONFIGURATION, /* bDescriptorType: Configuration */
-  USB_TEMPLATE_CONFIG_DESC_SIZ,
+  USB_DESC_TYPE_CONFIGURATION, /* bDescriptorType: Configuration */
+  USB_CONFIG_DESC_SIZ,
   /* wTotalLength: Bytes returned */
   0x00,
   0x01,         /*bNumInterfaces: 1 interface*/
   0x01,         /*bConfigurationValue: Configuration value*/
-  0x02,         /*iConfiguration: Index of string descriptor describing the configuration*/
-  0xC0,         /*bmAttributes: bus powered and Supports Remote Wakeup */
-  0x32,         /*MaxPower 100 mA: this current is used for detecting Vbus*/
-  /* 09 */
+  0x00,         /*iConfiguration: Index of string descriptor describing the configuration*/
+  0x80,         /*bmAttributes: not bus powered and doesnt Supports Remote Wakeup (bm=bit map)*/
+  0x32,         /*MaxPower 100 mA: this current is used for detecting Vbus (in 2mA units: 50*2=100)*/
+
+  /* Interface */
+  0x09,                     /* bLength */
+  USB_DESC_TYPE_INTERFACE,  /* bDescriptorType: */
+  0x01,                     /* bInterfaceNumber */
+  0x00,                     /* bAlternateSetting */
+  0x03,                     /* bNumEndpoints */
+  0xFF,                     /* bInterfaceClass, vendor specific */
+  0x00,                     /* bInterfaceSubClass */
+  0x00,                     /* bInterfaceProtocol */
+  0x00,                     /* iInterface */
+
+  /* Endpoint OUT */
+  0x07,                            	/* bLength */
+  USB_DESC_TYPE_ENDPOINT,          	/* bDescriptorType */
+  EPOUT_ADDR_SWD,             	 	/* bEndpointAddress */
+  0x02,                            	/* bmAttributes: 02=bulk */
+  LOBYTE(USB_HS_MAX_PACKET_SIZE),  	/* wMaxPacketSize */  //TODO is packet size correct?
+  HIBYTE(USB_HS_MAX_PACKET_SIZE),
+  0x00,                            	/* bInterval */
+
+  /* Endpoint IN */
+  0x07,                             /* bLength */
+  USB_DESC_TYPE_ENDPOINT,           /* bDescriptorType */
+  EPIN_ADDR_SWD,					/* bEndpointAddress */
+  0x02,                             /* bmAttributes 02=bulk*/
+  LOBYTE(USB_HS_MAX_PACKET_SIZE),   /* wMaxPacketSize */
+  HIBYTE(USB_HS_MAX_PACKET_SIZE),
+  0x00,                              /* bInterval */
+
+  /* Endpoint IN */
+  0x07,                             /* bLength */
+  USB_DESC_TYPE_ENDPOINT,           /* bDescriptorType */
+  EPIN_ADDR_SWO,         			/* bEndpointAddress */
+  0x02,                             /* bmAttributes 02=bulk*/
+  LOBYTE(USB_HS_MAX_PACKET_SIZE),   /* wMaxPacketSize */
+  HIBYTE(USB_HS_MAX_PACKET_SIZE),
+  0x00,                              /* bInterval */
+
 
   /**********  Descriptor of TEMPLATE interface 0 Alternate setting 0 **************/
 
@@ -210,7 +247,7 @@ static uint8_t USBD_TEMPLATE_Setup(USBD_HandleTypeDef *pdev,
 
   switch (req->bmRequest & USB_REQ_TYPE_MASK)
   {
-    case USB_REQ_TYPE_CLASS :
+    case USB_REQ_TYPE_CLASS :   //TODO add MODs request.
       switch (req->bRequest)
       {
         default:

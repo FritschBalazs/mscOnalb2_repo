@@ -40,10 +40,14 @@ extern "C" {
 /** @defgroup USBD_TEMPLATE_Exported_Defines
   * @{
   */
-#define TEMPLATE_EPIN_ADDR                 0x81U
-#define TEMPLATE_EPIN_SIZE                 0x10U
+#define EPOUT_ADDR_SWD				0x01U
+#define EPOUT_SIZE_SWD				0x10U
+#define EPIN_ADDR_SWD               0x81U
+#define EPIN_SIZE_SWD               0x10U
+#define EPIN_ADDR_SWO				0x81U
+#define EPIN_SIZE_SWO				0x10U
 
-#define USB_TEMPLATE_CONFIG_DESC_SIZ       64U
+#define USB_CONFIG_DESC_SIZ       	64U
 
 /**
   * @}

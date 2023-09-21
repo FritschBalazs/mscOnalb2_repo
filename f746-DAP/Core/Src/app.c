@@ -10,7 +10,8 @@
 #include "app.h"
 #include "main.h"
 #include "DAP_config.h"
-#include "usbd_customhid.h"
+//#include "usbd_customhid.h"
+#include "usbd_custom_class.h"
 #include "DAP.h"
 
 #define USB_HID_BUSY_USER_TIMEOUT (2U)
@@ -183,7 +184,7 @@ void APP_Run(void){
 		  }
 
 		  // Execute DAP Command (process request and prepare response)
-		  DAP_ExecuteCommand(USB_Request[USB_RequestIndexO], USB_Response[USB_ResponseIndexI]);
+		  //DAP_ExecuteCommand(USB_Request[USB_RequestIndexO], USB_Response[USB_ResponseIndexI]);
 
 		  // Update Request Index and Count
 		  USB_RequestIndexO++;
@@ -209,7 +210,7 @@ void APP_Run(void){
 			  USB_ResponseCountO++;
 			  USB_ResponseIdle = 0U;
 			  /* send data */
-			  HID_Send_Report(&hUsbDeviceHS, USB_Response[n], DAP_PACKET_SIZE);
+			  //HID_Send_Report(&hUsbDeviceHS, USB_Response[n], DAP_PACKET_SIZE);
 			}
 		  }
 		}
@@ -258,27 +259,27 @@ uint8_t HID_Send_Report(USBD_HandleTypeDef *pdev,uint8_t *report, uint16_t len){
 	}
 */
 	
-	if (USBD_CUSTOM_HID_SendReport(pdev, report, len) == CUSTOM_HID_BUSY){
-		uint32_t timestamp = HAL_GetTick();
-		while(USBD_CUSTOM_HID_SendReport(pdev, report, len) != USBD_OK && (timestamp + USB_HID_BUSY_USER_TIMEOUT >= HAL_GetTick())){
-			//wait
-		}
-	}
+//	if (USBD_CUSTOM_HID_SendReport(pdev, report, len) == CUSTOM_HID_BUSY){
+//		uint32_t timestamp = HAL_GetTick();
+//		while(USBD_CUSTOM_HID_SendReport(pdev, report, len) != USBD_OK && (timestamp + USB_HID_BUSY_USER_TIMEOUT >= HAL_GetTick())){
+//			//wait
+//		}
+//	}
 
 	return 0;
 
 }
 
 void APP_Setup(void){
-	DAP_Setup();                          // DAP Setup
+	//DAP_Setup();                          // DAP Setup
 
 
 
-	LED_CONNECTED_OUT(1U);                // Turn on  Debugger Connected LED
-	LED_RUNNING_OUT(1U);                  // Turn on  Target Running LED
-	Delayms(500U);                        // Wait for 500ms
-	LED_RUNNING_OUT(0U);                  // Turn off Target Running LED
-	LED_CONNECTED_OUT(0U);                // Turn off Debugger Connected LED //TODO connect LED
+	//LED_CONNECTED_OUT(1U);                // Turn on  Debugger Connected LED
+	//LED_RUNNING_OUT(1U);                  // Turn on  Target Running LED
+	//Delayms(500U);                        // Wait for 500ms
+//	LED_RUNNING_OUT(0U);                  // Turn off Target Running LED
+//	LED_CONNECTED_OUT(0U);                // Turn off Debugger Connected LED //TODO connect LED
 
 
 }

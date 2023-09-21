@@ -67,6 +67,8 @@ void Error_Handler(void);
 #define SWDIO_GPIO_Port GPIOG
 #define TARGET_RESET_Pin GPIO_PIN_6
 #define TARGET_RESET_GPIO_Port GPIOG
+#define LCD_BL_CTRL_Pin GPIO_PIN_8
+#define LCD_BL_CTRL_GPIO_Port GPIOD
 #define LED_CONNECTED_Pin GPIO_PIN_6
 #define LED_CONNECTED_GPIO_Port GPIOH
 /* USER CODE BEGIN Private defines */
