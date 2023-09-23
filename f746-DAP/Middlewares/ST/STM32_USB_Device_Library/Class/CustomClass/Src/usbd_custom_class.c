@@ -134,7 +134,7 @@ __ALIGN_BEGIN static uint8_t USBD_TEMPLATE_CfgDesc[USB_CONFIG_DESC_SIZ] __ALIGN_
   0x00,
   0x01,         /*bNumInterfaces: 1 interface*/
   0x01,         /*bConfigurationValue: Configuration value*/
-  0x00,         /*iConfiguration: Index of string descriptor describing the configuration*/
+  0x04,         /*iConfiguration: Index of string descriptor describing the configuration*/
   0x80,         /*bmAttributes: not bus powered and doesnt Supports Remote Wakeup (bm=bit map)*/
   0x32,         /*MaxPower 100 mA: this current is used for detecting Vbus (in 2mA units: 50*2=100)*/
 
@@ -147,7 +147,7 @@ __ALIGN_BEGIN static uint8_t USBD_TEMPLATE_CfgDesc[USB_CONFIG_DESC_SIZ] __ALIGN_
   0xFF,                     /* bInterfaceClass, vendor specific */
   0x00,                     /* bInterfaceSubClass */
   0x00,                     /* bInterfaceProtocol */
-  0x00,                     /* iInterface */
+  0x05,                     /* iInterface */
 
   /* Endpoint OUT */
   0x07,                            	/* bLength */
@@ -198,6 +198,7 @@ __ALIGN_BEGIN static uint8_t USBD_TEMPLATE_DeviceQualifierDesc[USB_LEN_DEV_QUALI
   0x01,
   0x00,
 };
+
 
 /**
   * @}

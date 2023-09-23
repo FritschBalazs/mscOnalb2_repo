@@ -22,6 +22,7 @@
 #include "usbd_core.h"
 #include "usbd_desc.h"
 #include "usbd_conf.h"
+#include "usbd_custom_class.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -45,6 +46,7 @@ uint8_t *USBD_Class_ProductStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *leng
 uint8_t *USBD_Class_SerialStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 uint8_t *USBD_Class_ConfigStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 uint8_t *USBD_Class_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+uint8_t *USBD_Class_MODStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 
 #if (USBD_CLASS_USER_STRING_DESC == 1)
 uint8_t *USBD_Class_UserStrDescriptor(USBD_SpeedTypeDef speed, uint8_t idx, uint16_t *length);
@@ -64,6 +66,7 @@ USBD_DescriptorsTypeDef Class_Desc =
   USBD_Class_SerialStrDescriptor,
   USBD_Class_ConfigStrDescriptor,
   USBD_Class_InterfaceStrDescriptor,
+  USBD_Class_MODStrDescriptor,
 #if (USBD_CLASS_USER_STRING_DESC == 1)
   USBD_Class_UserStrDescriptor,
 #endif /* USB_CLASS_USER_STRING_DESC */
@@ -246,6 +249,16 @@ __ALIGN_BEGIN uint8_t USBD_StringSerial[USB_SIZ_STRING_SERIAL] =
 #endif /* __ICCARM__ */
 __ALIGN_BEGIN uint8_t USBD_StrDesc[USBD_MAX_STR_DESC_SIZ] __ALIGN_END;
 
+#if defined ( __ICCARM__ ) /*!< IAR Compiler */
+#pragma data_alignment=4
+#endif /* __ICCARM__ */
+/* USB MS OS (string) Descriptor */
+__ALIGN_BEGIN static uint8_t USBD_TEMPLATE_MOD_STR[USB_LEN_MOD_STR] __ALIGN_END =
+{
+		//TODO create MS OS descriptor
+};
+
+
 /* Private functions ---------------------------------------------------------*/
 static void IntToUnicode(uint32_t value, uint8_t *pbuf, uint8_t len);
 static void Get_SerialNum(void);
@@ -366,6 +379,25 @@ uint8_t *USBD_Class_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *le
   }
   return USBD_StrDesc;
 }
+
+/**
+  * @brief  Returns the Microsoft OS (string) descriptor.
+  * @param  speed: Current device speed
+  * @param  length: Pointer to data length variable
+  * @retval Pointer to descriptor buffer
+  */
+uint8_t *USBD_Class_MODStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length){
+	  if (speed == USBD_SPEED_HIGH)
+	  {
+	    USBD_GetString((uint8_t *)USBD_TEMPLATE_MOD_STR, USBD_StrDesc, length);
+	  }
+	  else
+	  {
+	    USBD_GetString((uint8_t *)USBD_TEMPLATE_MOD_STR, USBD_StrDesc, length);
+	  }
+	  return USBD_StrDesc;
+}
+
 
 /**
   * @brief  Create the serial number string descriptor

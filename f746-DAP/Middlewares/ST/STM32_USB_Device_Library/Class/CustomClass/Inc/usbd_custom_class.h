@@ -75,7 +75,6 @@ extern "C" {
 /** @defgroup USBD_CORE_Exported_Variables
   * @{
   */
-
 extern USBD_ClassTypeDef USBD_TEMPLATE_ClassDriver;
 /**
   * @}

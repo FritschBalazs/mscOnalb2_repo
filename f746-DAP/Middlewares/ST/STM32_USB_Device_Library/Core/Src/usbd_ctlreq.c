@@ -554,6 +554,22 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
           }
           break;
 
+        case USBD_IDX_MOD_STR:		/* special entry for Microsoft OS descriptors */
+		{
+        	printf("Ms OS Str desc req to 0xEE. \r\n");
+
+            if (pdev->pDesc->GetMsOsStrDescriptor != NULL)
+            {
+              pbuf = pdev->pDesc->GetMsOsStrDescriptor(pdev->dev_speed, &len);
+            }
+            else
+            {
+              USBD_CtlError(pdev, req);
+              err++;
+            }
+            break;
+		};
+
         default:
 #if (USBD_SUPPORT_USER_STRING_DESC == 1U)
           pbuf = NULL;
