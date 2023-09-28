@@ -98,7 +98,6 @@ extern "C" {
 #define  USB_LEN_OTG_DESC                               0x03U
 #define  USB_LEN_LANGID_STR_DESC                        0x04U
 #define  USB_LEN_OTHER_SPEED_DESC_SIZ                   0x09U
-#define  USB_LEN_MOD_STR								0xffU  //TODO figure out MOD len!!
 
 #define  USBD_IDX_LANGID_STR                            0x00U
 #define  USBD_IDX_MFC_STR                               0x01U

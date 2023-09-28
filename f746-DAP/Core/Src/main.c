@@ -106,7 +106,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim14);
 
-  printf("CMSIS-DAP by Frici, bulk mode \r\n Build: "__DATE__" " __TIME__"\r\n");
+  printf("CMSIS-DAP by Frici, bulk mode \r\n");
+  printf("Build: "__DATE__" " __TIME__"\r\n");
 
   HAL_GPIO_WritePin(LCD_BL_CTRL_GPIO_Port, LCD_BL_CTRL_Pin, GPIO_PIN_RESET);
 

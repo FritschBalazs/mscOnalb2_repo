@@ -435,6 +435,7 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
     case USB_DESC_TYPE_BOS:
       if (pdev->pDesc->GetBOSDescriptor != NULL)
       {
+    	printf("BOS Dsc\r\n");	//TODO remove printf
         pbuf = pdev->pDesc->GetBOSDescriptor(pdev->dev_speed, &len);
       }
       else
@@ -445,6 +446,7 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
       break;
 #endif /* (USBD_LPM_ENABLED == 1U) || (USBD_CLASS_BOS_ENABLED == 1U) */
     case USB_DESC_TYPE_DEVICE:
+      printf("dev dsc\r\n");	//TODO remove printf
       pbuf = pdev->pDesc->GetDeviceDescriptor(pdev->dev_speed, &len);
       break;
 
@@ -459,6 +461,7 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
         else
 #endif /* USE_USBD_COMPOSITE */
         {
+          printf("Cfg HS dsc\r\n");	//TODO remove printf
           pbuf = (uint8_t *)pdev->pClass[0]->GetHSConfigDescriptor(&len);
         }
         pbuf[1] = USB_DESC_TYPE_CONFIGURATION;
@@ -473,6 +476,7 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
         else
 #endif /* USE_USBD_COMPOSITE */
         {
+          printf("Cfg FS dsc\r\n");	//TODO remove printf
           pbuf   = (uint8_t *)pdev->pClass[0]->GetFSConfigDescriptor(&len);
         }
         pbuf[1] = USB_DESC_TYPE_CONFIGURATION;
@@ -485,6 +489,7 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
         case USBD_IDX_LANGID_STR:
           if (pdev->pDesc->GetLangIDStrDescriptor != NULL)
           {
+        	printf("LangID dsc\r\n");	//TODO remove printf
             pbuf = pdev->pDesc->GetLangIDStrDescriptor(pdev->dev_speed, &len);
           }
           else
@@ -533,10 +538,12 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
         case USBD_IDX_CONFIG_STR:
           if (pdev->pDesc->GetConfigurationStrDescriptor != NULL)
           {
+            printf("Cfg str dsc\r\n");	//TODO remove printf
             pbuf = pdev->pDesc->GetConfigurationStrDescriptor(pdev->dev_speed, &len);
           }
           else
           {
+        	printf("Cfg str err\r\n");	//TODO remove printf
             USBD_CtlError(pdev, req);
             err++;
           }
@@ -626,11 +633,13 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
         else
 #endif /* USE_USBD_COMPOSITE */
         {
+          printf("DQ Dsc\r\n");	//TODO remove printf
           pbuf = (uint8_t *)pdev->pClass[0]->GetDeviceQualifierDescriptor(&len);
         }
       }
       else
       {
+    	printf("DQ err\r\n");	//TODO remove printf
         USBD_CtlError(pdev, req);
         err++;
       }
@@ -647,6 +656,7 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
         else
 #endif /* USE_USBD_COMPOSITE */
         {
+        	printf("Cfg OT dsc\r\n");	//TODO remove printf
           pbuf = (uint8_t *)pdev->pClass[0]->GetOtherSpeedConfigDescriptor(&len);
         }
         pbuf[1] = USB_DESC_TYPE_OTHER_SPEED_CONFIGURATION;

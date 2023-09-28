@@ -56,7 +56,7 @@ extern "C" {
 
 /* BillBoard Class Config */
 #define USBD_CLASS_USER_STRING_DESC                 0U
-#define USBD_CLASS_BOS_ENABLED                      0U
+#define USBD_CLASS_BOS_ENABLED                      1U
 #define USB_BB_MAX_NUM_ALT_MODE                     0x2U
 
 /* MSC Class Config */

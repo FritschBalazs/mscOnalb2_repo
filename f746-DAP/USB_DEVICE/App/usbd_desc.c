@@ -37,7 +37,38 @@
 #define USBD_CONFIGURATION_FS_STRING  "Config 1 FS" 						/* Add your configuration Full Speed string */
 #define USBD_INTERFACE_FS_STRING      "Tripple bulk EPs, no composite FS" 	/* Add your Interface Full Speed string */
 
+#define DESC_TYPE_DEVICE_CAPABILITY	  16U
+#define DEVICE_CAPABILITY_PLATFORM	  5U
+
+/* nomenclature from usbd_def.h */
+#define USB_LEN_MS_OS_DSC		      0xB2 	/* from picoprobe */
 /* Private macro -------------------------------------------------------------*/
+
+/* inspiration from TinyUSB*/
+#define TU_U16(_high, _low)   ((uint16_t) (((_high) << 8) | (_low)))
+#define TU_U16_HIGH(_u16)     ((uint8_t) (((_u16) >> 8) & 0x00ff))
+#define TU_U16_LOW(_u16)      ((uint8_t) ((_u16)       & 0x00ff))
+#define U16_TO_U8S_BE(_u16)   TU_U16_HIGH(_u16), TU_U16_LOW(_u16)
+#define U16_TO_U8S_LE(_u16)   TU_U16_LOW(_u16), TU_U16_HIGH(_u16)
+
+#define TU_U32_BYTE3(_u32)    ((uint8_t) ((((uint32_t) _u32) >> 24) & 0x000000ff)) // MSB
+#define TU_U32_BYTE2(_u32)    ((uint8_t) ((((uint32_t) _u32) >> 16) & 0x000000ff))
+#define TU_U32_BYTE1(_u32)    ((uint8_t) ((((uint32_t) _u32) >>  8) & 0x000000ff))
+#define TU_U32_BYTE0(_u32)    ((uint8_t) (((uint32_t)  _u32)        & 0x000000ff)) // LSB
+
+#define U32_TO_U8S_BE(_u32)   TU_U32_BYTE3(_u32), TU_U32_BYTE2(_u32), TU_U32_BYTE1(_u32), TU_U32_BYTE0(_u32)
+#define U32_TO_U8S_LE(_u32)   TU_U32_BYTE0(_u32), TU_U32_BYTE1(_u32), TU_U32_BYTE2(_u32), TU_U32_BYTE3(_u32)
+
+#define MS_OS_20_SET_HEADER_DESCRIPTOR       0x00
+#define MS_OS_20_SUBSET_HEADER_CONFIGURATION 0x01
+#define MS_OS_20_SUBSET_HEADER_FUNCTION      0x02
+#define MS_OS_20_FEATURE_COMPATBLE_ID        0x03
+#define MS_OS_20_FEATURE_REG_PROPERTY        0x04
+#define MS_OS_20_FEATURE_MIN_RESUME_TIME     0x05
+#define MS_OS_20_FEATURE_MODEL_ID            0x06
+#define MS_OS_20_FEATURE_CCGP_DEVICE         0x07
+#define MS_OS_20_FEATURE_VENDOR_REVISION     0x08
+
 /* Private function prototypes -----------------------------------------------*/
 uint8_t *USBD_Class_DeviceDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 uint8_t *USBD_Class_LangIDStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
@@ -88,7 +119,7 @@ __ALIGN_BEGIN uint8_t USBD_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
   0x01,                       /*bcdUSB */     /* changed to USB version 2.01
                                               in order to support BOS Desc */
 #else
-  0x00,                       /* bcdUSB */
+  0x01, //0x00,                       /* bcdUSB */
 #endif /* (USBD_LPM_ENABLED == 1) || (USBD_CLASS_BOS_ENABLED == 1) */
   0x02,
   0xFF,						  /* bDeviceClass: vendor specific */
@@ -97,8 +128,8 @@ __ALIGN_BEGIN uint8_t USBD_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
   USB_MAX_EP0_SIZE,           /* bMaxPacketSize */
   LOBYTE(USBD_VID),           /* idVendor */
   HIBYTE(USBD_VID),           /* idVendor */
-  LOBYTE(USBD_PID),           /* idVendor */
-  HIBYTE(USBD_PID),           /* idVendor */
+  LOBYTE(USBD_PID),           /* idProducz */
+  HIBYTE(USBD_PID),           /* idProduct */
   0x00,                       /* bcdDevice rel. 2.00 */
   0x02,
   USBD_IDX_MFC_STR,           /* Index of manufacturer string */
@@ -140,85 +171,27 @@ __ALIGN_BEGIN  uint8_t USBD_BOSDesc[USB_SIZ_BOS_DESC] __ALIGN_END =
 {
   0x05,                                /* bLength */
   USB_DESC_TYPE_BOS,                   /* Device Descriptor Type */
-  USB_SIZ_BOS_DESC,                    /* Total length of BOS descriptor and all of its sub descs */
-  0x00,
-  0x04,                                /* The number of separate device capability descriptors in the BOS */
+  LOBYTE(USB_SIZ_BOS_DESC),            /* Total length of BOS descriptor and all of its sub descs */
+  HIBYTE(USB_SIZ_BOS_DESC),
+  0x01,                                /* The number of separate device capability descriptors in the BOS */
 
-  /* ----------- Device Capability Descriptor: CONTAINER_ID ---------- */
-  0x14,                                /* bLength */
-  0x10,                                /* bDescriptorType: DEVICE CAPABILITY Type */
-  0x04,                                /* bDevCapabilityType: CONTAINER_ID */
-  0x00,                                /* bReserved */
-  0xa7, 0xd6, 0x1b, 0xfa,              /* ContainerID: This is a Unique 128-bit number GUID */
-  0x91, 0xa6, 0xa8, 0x4e,
-  0xa8, 0x21, 0x9f, 0x2b,
-  0xaf, 0xf7, 0x94, 0xd4,
+  /* Device Capability Platform descriptor */
+  0x1C,		   						   /* bLength = 28 bytes*/
+  DESC_TYPE_DEVICE_CAPABILITY,		   /* bDescriptorType */
+  DEVICE_CAPABILITY_PLATFORM,		   /* bDevCapabilityType */
+  0x00,								   /* bReserved */
+  0xDF, 0x60, 0xDD, 0xD8,		       /* MS_OS_20_Platform_Capability_ID = D8DD60DF-4589-4CC7-9CD2-659D9E648A9F */
+  0x89, 0x45,						   /* 	the byte order flips midway in the comment but if you google  */
+  0xC7, 0x4C,						   /* 	MS_OS_20_Platform_Capability_ID, all of the results are like this */
+  0x9C, 0xD2, 						   /*	so I assume that the OG comment in the OG documentation if wrong */
+  0x65, 0x9D, 0x9E, 0x64, 0x8A, 0x9F,
 
-  /* ----------- Device Capability Descriptor: BillBoard ---------- */
-  0x34,                                /* bLength */
-  0x10,                                /* bDescriptorType: DEVICE CAPABILITY Type */
-  0x0D,                                /* bDevCapabilityType: BILLBOARD_CAPABILITY */
-  USBD_BB_URL_STRING_INDEX,            /* iAddtionalInfoURL: Index of string descriptor providing a URL where the user
-                                          can go to get more detailed information about the product and the various
-                                          Alternate Modes it supports */
+  /*Descriptor Set information 1 */
+  U32_TO_U8S_LE(0x06030000),		   /* dwWindowsVersion = Windows 8.1 or later */
+  U16_TO_U8S_LE(USB_LEN_MS_OS_DSC),	   /* wMSOSDescriptorSetTotalLength */
+  0x01,						   		   /* bMS_VendorCode */
+  0x00,								   /* bAltEnumCode */
 
-  0x02,                                /* bNumberOfAlternateModes: Number of Alternate modes supported. The
-                                        maximum value that this field can be set to is MAX_NUM_ALT_MODE. */
-
-  0x00,                                /* bPreferredAlternateMode: Index of the preferred Alternate Mode. System
-                                          software may use this information to provide the user with a better
-                                          user experience. */
-
-  0x00, 0x00,                          /* VCONN Power needed by the adapter for full functionality 000b = 1W */
-
-  0x01, 0x00, 0x00, 0x00,              /* bmConfigured. 01b: Alternate Mode configuration not attempted or exited */
-  0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00,
-  0x21, 0x01,                          /* bcdVersion = 0x0121 */
-  0x00,                                /* bAdditionalFailureInfo */
-  0x00,                                /* bReserved */
-  LOBYTE(USBD_VID),
-  HIBYTE(USBD_VID),                    /* wSVID[0]: Standard or Vendor ID. This shall match one of the SVIDs
-                                        returned in response to a USB PD Discover SVIDs command */
-
-  0x00,                                /* bAlternateMode[0] Index of the Alternate Mode within the SVID as
-                                        returned in response to a Discover Modes command. Example:
-                                        0  first Mode entry
-                                        1  second mode entry */
-
-  USBD_BB_ALTMODE0_STRING_INDEX,           /* iAlternateModeString[0]: Index of string descriptor describing protocol.
-                                        It is optional to support this string. */
-  LOBYTE(USBD_VID),
-  HIBYTE(USBD_VID),                    /* wSVID[1]: Standard or Vendor ID. This shall match one of the SVIDs
-                                        returned in response to a USB PD Discover SVIDs command */
-
-  0x01,                                /* bAlternateMode[1] Index of the Alternate Mode within the SVID as
-                                        returned in response to a Discover Modes command. Example:
-                                        0  first Mode entry
-                                        1  second Mode entry */
-
-  USBD_BB_ALTMODE1_STRING_INDEX,       /* iAlternateModeString[1]: Index of string descriptor describing protocol.
-                                        It is optional to support this string. */
-  /* Alternate Mode Desc */
-  /* ----------- Device Capability Descriptor: BillBoard Alternate Mode Desc ---------- */
-  0x08,                                /* bLength */
-  0x10,                                /* bDescriptorType: Device Descriptor Type */
-  0x0F,                                /* bDevCapabilityType: BILLBOARD ALTERNATE MODE CAPABILITY */
-  0x00,                                /* bIndex: Index of Alternate Mode described in the Billboard Capability Desc */
-  0x10, 0x00, 0x00, 0x00,              /* dwAlternateModeVdo: contents of the Mode VDO for the alternate mode
-                                          identified by bIndex */
-
-  0x08,                                /* bLength */
-  0x10,                                /* bDescriptorType: Device Descriptor Type */
-  0x0F,                                /* bDevCapabilityType: BILLBOARD ALTERNATE MODE CAPABILITY */
-  0x01,                                /* bIndex: Index of Alternate Mode described in the Billboard Capability Desc */
-  0x20, 0x00, 0x00, 0x00,              /* dwAlternateModeVdo: contents of the Mode VDO for the alternate mode
-                                          identified by bIndex */
 };
 #endif /* USBD_CLASS_BOS_ENABLED */
 
@@ -249,13 +222,47 @@ __ALIGN_BEGIN uint8_t USBD_StringSerial[USB_SIZ_STRING_SERIAL] =
 #endif /* __ICCARM__ */
 __ALIGN_BEGIN uint8_t USBD_StrDesc[USBD_MAX_STR_DESC_SIZ] __ALIGN_END;
 
+/* following section is taken from picoprobe project: */
+
+
+/* Microsoft OS 2.0 registry property descriptor
+Per MS requirements https://msdn.microsoft.com/en-us/library/windows/hardware/hh450799(v=vs.85).aspx
+device should create DeviceInterfaceGUIDs. It can be done by driver and
+in case of real PnP solution device should expose MS "Microsoft OS 2.0
+registry property descriptor". Such descriptor can insert any record
+into Windows registry per device/configuration/interface. In our case it
+will insert "DeviceInterfaceGUIDs" multistring property. */
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
 #pragma data_alignment=4
 #endif /* __ICCARM__ */
-/* USB MS OS (string) Descriptor */
-__ALIGN_BEGIN static uint8_t USBD_TEMPLATE_MOD_STR[USB_LEN_MOD_STR] __ALIGN_END =
+/* USB MS OS 2.0 (string) Descriptor */
+__ALIGN_BEGIN static uint8_t USBD_TEMPLATE_MOD_STR[USB_LEN_MS_OS_DSC] __ALIGN_END =
 {
-		//TODO create MS OS descriptor
+  // Set header: length, type, windows version, total length
+  U16_TO_U8S_LE(0x000A), U16_TO_U8S_LE(MS_OS_20_SET_HEADER_DESCRIPTOR), U32_TO_U8S_LE(0x06030000), U16_TO_U8S_LE(USB_LEN_MS_OS_DSC),
+
+  // Configuration subset header: length, type, configuration index, reserved, configuration total length
+  U16_TO_U8S_LE(0x0008), U16_TO_U8S_LE(MS_OS_20_SUBSET_HEADER_CONFIGURATION), 0, 0, U16_TO_U8S_LE(USB_LEN_MS_OS_DSC-0x0A),
+
+  // Function Subset header: length, type, first interface, reserved, subset length
+  U16_TO_U8S_LE(0x0008), U16_TO_U8S_LE(MS_OS_20_SUBSET_HEADER_FUNCTION), DAP_V2_IF_NUM , 0, U16_TO_U8S_LE(USB_LEN_MS_OS_DSC-0x0A-0x08), //TODO is this the correct IF number
+
+  // MS OS 2.0 Compatible ID descriptor: length, type, compatible ID, sub compatible ID
+  U16_TO_U8S_LE(0x0014), U16_TO_U8S_LE(MS_OS_20_FEATURE_COMPATBLE_ID), 'W', 'I', 'N', 'U', 'S', 'B', 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // sub-compatible
+
+  // MS OS 2.0 Registry property descriptor: length, type
+  U16_TO_U8S_LE(USB_LEN_MS_OS_DSC-0x0A-0x08-0x08-0x14), U16_TO_U8S_LE(MS_OS_20_FEATURE_REG_PROPERTY),
+  U16_TO_U8S_LE(0x0007), U16_TO_U8S_LE(0x002A), // wPropertyDataType, wPropertyNameLength and PropertyName "DeviceInterfaceGUIDs\0" in UTF-16
+  'D', 0x00, 'e', 0x00, 'v', 0x00, 'i', 0x00, 'c', 0x00, 'e', 0x00, 'I', 0x00, 'n', 0x00, 't', 0x00, 'e', 0x00,
+  'r', 0x00, 'f', 0x00, 'a', 0x00, 'c', 0x00, 'e', 0x00, 'G', 0x00, 'U', 0x00, 'I', 0x00, 'D', 0x00, 's', 0x00, 0x00, 0x00,
+  U16_TO_U8S_LE(0x0050), // wPropertyDataLength
+  // bPropertyData "{CDB3B5AD-293B-4663-AA36-1AAE46463776}" as a UTF-16 string (b doesn't mean bytes)
+  '{', 0x00, 'C', 0x00, 'D', 0x00, 'B', 0x00, '3', 0x00, 'B', 0x00, '5', 0x00, 'A', 0x00, 'D', 0x00, '-', 0x00,
+  '2', 0x00, '9', 0x00, '3', 0x00, 'B', 0x00, '-', 0x00, '4', 0x00, '6', 0x00, '6', 0x00, '3', 0x00, '-', 0x00,
+  'A', 0x00, 'A', 0x00, '3', 0x00, '6', 0x00, '-', 0x00, '1', 0x00, 'A', 0x00, 'A', 0x00, 'E', 0x00, '4', 0x00,
+  '6', 0x00, '4', 0x00, '6', 0x00, '3', 0x00, '7', 0x00, '7', 0x00, '6', 0x00, '}', 0x00, 0x00, 0x00, 0x00, 0x00
+
 };
 
 

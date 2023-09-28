@@ -50,7 +50,7 @@
 #if (USBD_LPM_ENABLED == 1)
 #define  USB_SIZ_BOS_DESC            0x0CU
 #elif (USBD_CLASS_BOS_ENABLED == 1)
-#define  USB_SIZ_BOS_DESC            0x5DU
+#define  USB_SIZ_BOS_DESC            33U	/* from TinyUSB */
 #endif /* USBD_LPM_ENABLED  */
 
 /* Exported macro ------------------------------------------------------------*/

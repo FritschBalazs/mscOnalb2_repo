@@ -40,6 +40,7 @@ extern "C" {
 /** @defgroup USBD_TEMPLATE_Exported_Defines
   * @{
   */
+#define DAP_V2_IF_NUM				0x01U
 #define EPOUT_ADDR_SWD				0x01U
 #define EPOUT_SIZE_SWD				0x10U
 #define EPIN_ADDR_SWD               0x81U

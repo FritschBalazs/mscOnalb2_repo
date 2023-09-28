@@ -141,7 +141,7 @@ __ALIGN_BEGIN static uint8_t USBD_TEMPLATE_CfgDesc[USB_CONFIG_DESC_SIZ] __ALIGN_
   /* Interface */
   0x09,                     /* bLength */
   USB_DESC_TYPE_INTERFACE,  /* bDescriptorType: */
-  0x01,                     /* bInterfaceNumber */
+  DAP_V2_IF_NUM,            /* bInterfaceNumber */
   0x00,                     /* bAlternateSetting */
   0x03,                     /* bNumEndpoints */
   0xFF,                     /* bInterfaceClass, vendor specific */
@@ -248,7 +248,7 @@ static uint8_t USBD_TEMPLATE_Setup(USBD_HandleTypeDef *pdev,
 
   switch (req->bmRequest & USB_REQ_TYPE_MASK)
   {
-    case USB_REQ_TYPE_CLASS :   //TODO add MODs request.
+    case USB_REQ_TYPE_CLASS :   //TODO add MODs request. Talan megsem ide kell.
       switch (req->bRequest)
       {
         default:
