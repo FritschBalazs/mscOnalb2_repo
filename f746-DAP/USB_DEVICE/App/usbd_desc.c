@@ -41,7 +41,7 @@
 #define DEVICE_CAPABILITY_PLATFORM	  5U
 
 /* nomenclature from usbd_def.h */
-#define USB_LEN_MS_OS_DSC		      0xB2 	/* from picoprobe */
+#define USB_LEN_MS_OS_DSC		      0xA2 	/* from picoprobe */
 /* Private macro -------------------------------------------------------------*/
 
 /* inspiration from TinyUSB*/
@@ -116,7 +116,7 @@ __ALIGN_BEGIN uint8_t USBD_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
   0x12,                       /* bLength */
   USB_DESC_TYPE_DEVICE,       /* bDescriptorType */
 #if ((USBD_LPM_ENABLED == 1) || (USBD_CLASS_BOS_ENABLED == 1))
-  0x01,                       /*bcdUSB */     /* changed to USB version 2.01
+  0x01, /*0x01,*/                       /*bcdUSB */     /* changed to USB version 2.01
                                               in order to support BOS Desc */
 #else
   0x01, //0x00,                       /* bcdUSB */
@@ -128,8 +128,8 @@ __ALIGN_BEGIN uint8_t USBD_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
   USB_MAX_EP0_SIZE,           /* bMaxPacketSize */
   LOBYTE(USBD_VID),           /* idVendor */
   HIBYTE(USBD_VID),           /* idVendor */
-  LOBYTE(USBD_PID),           /* idProducz */
-  HIBYTE(USBD_PID),           /* idProduct */
+  LOBYTE(0x5722+1), //LOBYTE(USBD_PID),           /* idProducz */
+  HIBYTE(0x5722), //HIBYTE(USBD_PID),           /* idProduct */
   0x00,                       /* bcdDevice rel. 2.00 */
   0x02,
   USBD_IDX_MFC_STR,           /* Index of manufacturer string */
@@ -189,7 +189,7 @@ __ALIGN_BEGIN  uint8_t USBD_BOSDesc[USB_SIZ_BOS_DESC] __ALIGN_END =
   /*Descriptor Set information 1 */
   U32_TO_U8S_LE(0x06030000),		   /* dwWindowsVersion = Windows 8.1 or later */
   U16_TO_U8S_LE(USB_LEN_MS_OS_DSC),	   /* wMSOSDescriptorSetTotalLength */
-  0x01,						   		   /* bMS_VendorCode */
+  0x20,//0x01,						   		   /* bMS_VendorCode */
   0x00,								   /* bAltEnumCode */
 
 };
@@ -242,17 +242,17 @@ __ALIGN_BEGIN static uint8_t USBD_TEMPLATE_MOD_STR[USB_LEN_MS_OS_DSC] __ALIGN_EN
   U16_TO_U8S_LE(0x000A), U16_TO_U8S_LE(MS_OS_20_SET_HEADER_DESCRIPTOR), U32_TO_U8S_LE(0x06030000), U16_TO_U8S_LE(USB_LEN_MS_OS_DSC),
 
   // Configuration subset header: length, type, configuration index, reserved, configuration total length
-  U16_TO_U8S_LE(0x0008), U16_TO_U8S_LE(MS_OS_20_SUBSET_HEADER_CONFIGURATION), 0, 0, U16_TO_U8S_LE(USB_LEN_MS_OS_DSC-0x0A),
+  //U16_TO_U8S_LE(0x0008), U16_TO_U8S_LE(MS_OS_20_SUBSET_HEADER_CONFIGURATION), 0, 0, U16_TO_U8S_LE(USB_LEN_MS_OS_DSC-0x0A),
 
   // Function Subset header: length, type, first interface, reserved, subset length
-  U16_TO_U8S_LE(0x0008), U16_TO_U8S_LE(MS_OS_20_SUBSET_HEADER_FUNCTION), DAP_V2_IF_NUM , 0, U16_TO_U8S_LE(USB_LEN_MS_OS_DSC-0x0A-0x08), //TODO is this the correct IF number
+  //U16_TO_U8S_LE(0x0008), U16_TO_U8S_LE(MS_OS_20_SUBSET_HEADER_FUNCTION), DAP_V2_IF_NUM , 0, U16_TO_U8S_LE(USB_LEN_MS_OS_DSC-0x0A-0x08), //TODO is this the correct IF number
 
   // MS OS 2.0 Compatible ID descriptor: length, type, compatible ID, sub compatible ID
   U16_TO_U8S_LE(0x0014), U16_TO_U8S_LE(MS_OS_20_FEATURE_COMPATBLE_ID), 'W', 'I', 'N', 'U', 'S', 'B', 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // sub-compatible
 
   // MS OS 2.0 Registry property descriptor: length, type
-  U16_TO_U8S_LE(USB_LEN_MS_OS_DSC-0x0A-0x08-0x08-0x14), U16_TO_U8S_LE(MS_OS_20_FEATURE_REG_PROPERTY),
+  U16_TO_U8S_LE(USB_LEN_MS_OS_DSC-0x0A/*-0x08-0x08*/-0x14), U16_TO_U8S_LE(MS_OS_20_FEATURE_REG_PROPERTY),
   U16_TO_U8S_LE(0x0007), U16_TO_U8S_LE(0x002A), // wPropertyDataType, wPropertyNameLength and PropertyName "DeviceInterfaceGUIDs\0" in UTF-16
   'D', 0x00, 'e', 0x00, 'v', 0x00, 'i', 0x00, 'c', 0x00, 'e', 0x00, 'I', 0x00, 'n', 0x00, 't', 0x00, 'e', 0x00,
   'r', 0x00, 'f', 0x00, 'a', 0x00, 'c', 0x00, 'e', 0x00, 'G', 0x00, 'U', 0x00, 'I', 0x00, 'D', 0x00, 's', 0x00, 0x00, 0x00,
@@ -396,13 +396,17 @@ uint8_t *USBD_Class_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *le
 uint8_t *USBD_Class_MODStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length){
 	  if (speed == USBD_SPEED_HIGH)
 	  {
-	    USBD_GetString((uint8_t *)USBD_TEMPLATE_MOD_STR, USBD_StrDesc, length);
+		  *length = sizeof(USBD_TEMPLATE_MOD_STR);
+		   return (uint8_t *)USBD_TEMPLATE_MOD_STR;
+	    //USBD_GetString((uint8_t *)USBD_TEMPLATE_MOD_STR, USBD_StrDesc, length);
 	  }
 	  else
 	  {
-	    USBD_GetString((uint8_t *)USBD_TEMPLATE_MOD_STR, USBD_StrDesc, length);
+		  *length = sizeof(USBD_TEMPLATE_MOD_STR);
+		   return (uint8_t *)USBD_TEMPLATE_MOD_STR;
+	    //USBD_GetString((uint8_t *)USBD_TEMPLATE_MOD_STR, USBD_StrDesc, length);
 	  }
-	  return USBD_StrDesc;
+	  //return USBD_StrDesc;
 }
 
 

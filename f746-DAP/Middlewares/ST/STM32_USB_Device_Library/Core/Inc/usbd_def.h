@@ -105,7 +105,7 @@ extern "C" {
 #define  USBD_IDX_SERIAL_STR                            0x03U
 #define  USBD_IDX_CONFIG_STR                            0x04U
 #define  USBD_IDX_INTERFACE_STR                         0x05U
-#define  USBD_IDX_MOD_STR								0x77U  /*MS OS Descriptor */
+#define  USBD_IDX_MOD_STR								0xEEU  /*MS OS Descriptor */
 
 #define  USB_REQ_TYPE_STANDARD                          0x00U
 #define  USB_REQ_TYPE_CLASS                             0x20U
@@ -128,6 +128,9 @@ extern "C" {
 #define  USB_REQ_GET_INTERFACE                          0x0AU
 #define  USB_REQ_SET_INTERFACE                          0x0BU
 #define  USB_REQ_SYNCH_FRAME                            0x0CU
+#define  USB_REQ_MS_VendorCode							0x20U
+/* Added for MS OS support */
+#define USB_REQ_MS_VENDOR_CODE							0xA0
 
 #define  USB_DESC_TYPE_DEVICE                           0x01U
 #define  USB_DESC_TYPE_CONFIGURATION                    0x02U
@@ -136,6 +139,7 @@ extern "C" {
 #define  USB_DESC_TYPE_ENDPOINT                         0x05U
 #define  USB_DESC_TYPE_DEVICE_QUALIFIER                 0x06U
 #define  USB_DESC_TYPE_OTHER_SPEED_CONFIGURATION        0x07U
+#define  USB_DESC_TYPE_MS_OS							USB_REQ_MS_VendorCode //TODO add use winusb plus connect to BOS descriptor bMS_VendorCode
 #define  USB_DESC_TYPE_IAD                              0x0BU
 #define  USB_DESC_TYPE_BOS                              0x0FU
 

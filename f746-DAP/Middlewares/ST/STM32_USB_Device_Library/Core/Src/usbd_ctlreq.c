@@ -141,6 +141,11 @@ USBD_StatusTypeDef USBD_StdDevReq(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef
           USBD_ClrFeature(pdev, req);
           break;
 
+        case USB_REQ_MS_VendorCode:
+        	printf("yes");
+        	USBD_GetDescriptor(pdev, req);
+        	break;
+
         default:
           USBD_CtlError(pdev, req);
           break;
@@ -220,6 +225,11 @@ USBD_StatusTypeDef USBD_StdItfReq(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef
       break;
 
     default:
+      if ( req->bmRequest == 0xC1 ) {
+    	  printf("yes 2\r\n");
+    	  //USBD_WinUSBGetDescriptor( pdev, req );  //TODO add winusb use define
+		 break;
+	  }
       USBD_CtlError(pdev, req);
       break;
   }
@@ -563,11 +573,11 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
 
         case USBD_IDX_MOD_STR:		/* special entry for Microsoft OS descriptors */
 		{
-        	printf("Ms OS Str desc req to 0xEE. \r\n");
+        	printf("MOD 0xEE. \r\n");   //TODO remove printf
 
             if (pdev->pDesc->GetMsOsStrDescriptor != NULL)
             {
-              pbuf = pdev->pDesc->GetMsOsStrDescriptor(pdev->dev_speed, &len);
+              //pbuf = pdev->pDesc->GetMsOsStrDescriptor(pdev->dev_speed, &len);
             }
             else
             {
@@ -667,6 +677,12 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
         err++;
       }
       break;
+
+    case USB_DESC_TYPE_MS_OS:
+    	{
+    		printf("0x20 req \r\n");
+    		pbuf = pdev->pDesc->GetMsOsStrDescriptor(pdev->dev_speed, &len);
+    	}
 
     default:
       USBD_CtlError(pdev, req);
