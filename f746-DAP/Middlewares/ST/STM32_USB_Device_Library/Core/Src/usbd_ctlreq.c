@@ -228,6 +228,7 @@ USBD_StatusTypeDef USBD_StdItfReq(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef
       if ( req->bmRequest == 0xC1 ) {
     	  printf("yes 2\r\n");
     	  //USBD_WinUSBGetDescriptor( pdev, req );  //TODO add winusb use define
+
 		 break;
 	  }
       USBD_CtlError(pdev, req);
@@ -443,9 +444,9 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
   {
 #if ((USBD_LPM_ENABLED == 1U) || (USBD_CLASS_BOS_ENABLED == 1U))
     case USB_DESC_TYPE_BOS:
+      printf("BOS Dsc\r\n");	//TODO remove printf
       if (pdev->pDesc->GetBOSDescriptor != NULL)
       {
-    	printf("BOS Dsc\r\n");	//TODO remove printf
         pbuf = pdev->pDesc->GetBOSDescriptor(pdev->dev_speed, &len);
       }
       else

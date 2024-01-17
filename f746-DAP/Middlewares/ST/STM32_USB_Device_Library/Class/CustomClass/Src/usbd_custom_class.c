@@ -141,7 +141,7 @@ __ALIGN_BEGIN static uint8_t USBD_TEMPLATE_CfgDesc[USB_CONFIG_DESC_SIZ] __ALIGN_
   /* Interface */
   0x09,                     /* bLength */
   USB_DESC_TYPE_INTERFACE,  /* bDescriptorType: */
-  DAP_V2_IF_NUM,            /* bInterfaceNumber */
+  DAP_V2_IF_NUM,            /* bInterfaceNumber */  //ToDo try 0 for interface according to polulu example
   0x00,                     /* bAlternateSetting */
   0x03,                     /* bNumEndpoints */
   0xFF,                     /* bInterfaceClass, vendor specific */
@@ -246,9 +246,13 @@ static uint8_t USBD_TEMPLATE_Setup(USBD_HandleTypeDef *pdev,
 {
   USBD_StatusTypeDef ret = USBD_OK;
 
+  uint16_t len = 0U;
+  uint8_t *pbuf = NULL;
+  uint8_t err = 0U;
+
   switch (req->bmRequest & USB_REQ_TYPE_MASK)
   {
-    case USB_REQ_TYPE_CLASS :   //TODO add MODs request. Talan megsem ide kell.
+    case USB_REQ_TYPE_CLASS :
       switch (req->bRequest)
       {
         default:
@@ -257,6 +261,21 @@ static uint8_t USBD_TEMPLATE_Setup(USBD_HandleTypeDef *pdev,
           break;
       }
       break;
+    case USB_REQ_TYPE_VENDOR :
+	  switch (req->bRequest)
+	  {
+	    case USB_REQ_MS_VendorCode:
+	    	//TODO innen folytasd!!!!!!!! add MODs request.
+	        pbuf = pdev->pDesc->GetDeviceDescriptor(pdev->dev_speed, &len);
+	        break;
+	      ret = USBD_OK;
+	      break;
+		default:
+		  USBD_CtlError(pdev, req);
+		  ret = USBD_FAIL;
+		  break;
+	  }
+	  break;
 
     case USB_REQ_TYPE_STANDARD:
       switch (req->bRequest)
