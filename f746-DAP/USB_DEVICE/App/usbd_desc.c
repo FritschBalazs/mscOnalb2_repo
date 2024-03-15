@@ -189,7 +189,7 @@ __ALIGN_BEGIN  uint8_t USBD_BOSDesc[USB_SIZ_BOS_DESC] __ALIGN_END =
   /*Descriptor Set information 1 */
   U32_TO_U8S_LE(0x06030000),		   /* dwWindowsVersion = Windows 8.1 or later */
   U16_TO_U8S_LE(USB_LEN_MS_OS_DSC),	   /* wMSOSDescriptorSetTotalLength */
-  0x20,//0x01,						   		   /* bMS_VendorCode */
+  USB_REQ_MS_VendorCode,			   /* bMS_VendorCode */
   0x00,								   /* bAltEnumCode */
 
 };

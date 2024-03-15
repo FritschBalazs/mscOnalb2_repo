@@ -133,7 +133,7 @@ __ALIGN_BEGIN static uint8_t USBD_TEMPLATE_CfgDesc[USB_CONFIG_DESC_SIZ] __ALIGN_
   0x00,
   0x01,         /*bNumInterfaces: 1 interface*/
   0x01,         /*bConfigurationValue: Configuration value*/
-  0x00,         /*iConfiguration: Index of string descriptor describing the configuration*/
+  0x04,         /*iConfiguration: Index of string descriptor describing the configuration*/
   0x80,         /*bmAttributes: not bus powered and doesnt Supports Remote Wakeup (bm=bit map)*/
   0x32,         /*MaxPower 100 mA: this current is used for detecting Vbus (in 2mA units: 50*2=100)*/
 
@@ -239,6 +239,8 @@ static uint8_t USBD_TEMPLATE_DeInit(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
   * @param  pdev: instance
   * @param  req: usb requests
   * @retval status
+  *
+  * @note   this is still setup phase, data is going trough ep0
   */
 static uint8_t USBD_TEMPLATE_Setup(USBD_HandleTypeDef *pdev,
                                    USBD_SetupReqTypedef *req)
@@ -264,8 +266,8 @@ static uint8_t USBD_TEMPLATE_Setup(USBD_HandleTypeDef *pdev,
 	  switch (req->bRequest)
 	  {
 	    case USB_REQ_MS_VendorCode:
-	    	//TODO innen folytasd!!!!!!!! add MODs request.
-	        pbuf = pdev->pDesc->GetDeviceDescriptor(pdev->dev_speed, &len);
+	    	printf("MS OS Str Descriptor\n\r");
+	        pbuf = pdev->pDesc->GetMsOsStrDescriptor(pdev->dev_speed, &len);
 	        break;
 	      ret = USBD_OK;
 	      break;
@@ -291,6 +293,23 @@ static uint8_t USBD_TEMPLATE_Setup(USBD_HandleTypeDef *pdev,
       ret = USBD_FAIL;
       break;
   }
+
+  if (req->wLength != 0U)  //TODO cleanup, add proper retval
+    {
+      if (len != 0U)
+      {
+        len = MIN(len, req->wLength);
+        (void)USBD_CtlSendData(pdev, pbuf, len);
+      }
+      else
+      {
+        USBD_CtlError(pdev, req);
+      }
+    }
+    else
+    {
+      (void)USBD_CtlSendStatus(pdev);
+    }
 
   return (uint8_t)ret;
 }

@@ -128,9 +128,7 @@ extern "C" {
 #define  USB_REQ_GET_INTERFACE                          0x0AU
 #define  USB_REQ_SET_INTERFACE                          0x0BU
 #define  USB_REQ_SYNCH_FRAME                            0x0CU
-#define  USB_REQ_MS_VendorCode							0x20U
-/* Added for MS OS support */
-#define USB_REQ_MS_VENDOR_CODE							0xA0
+#define  USB_REQ_MS_VendorCode							0x20U /* Added for MS OS support TODO: figure out why 0x20? */
 
 #define  USB_DESC_TYPE_DEVICE                           0x01U
 #define  USB_DESC_TYPE_CONFIGURATION                    0x02U
