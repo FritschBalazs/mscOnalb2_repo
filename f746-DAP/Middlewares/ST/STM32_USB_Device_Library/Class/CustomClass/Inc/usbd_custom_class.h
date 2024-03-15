@@ -45,7 +45,7 @@ extern "C" {
 #define EPOUT_SIZE_SWD				0x10U
 #define EPIN_ADDR_SWD               0x81U
 #define EPIN_SIZE_SWD               0x10U
-#define EPIN_ADDR_SWO				0x81U
+#define EPIN_ADDR_SWO				0x82U
 #define EPIN_SIZE_SWO				0x10U
 
 #define USB_CONFIG_DESC_SIZ       	39U

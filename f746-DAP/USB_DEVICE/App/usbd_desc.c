@@ -130,8 +130,8 @@ __ALIGN_BEGIN uint8_t USBD_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
   HIBYTE(USBD_VID),           /* idVendor */
   LOBYTE(0x5722+1), //LOBYTE(USBD_PID),           /* idProducz */
   HIBYTE(0x5722), //HIBYTE(USBD_PID),           /* idProduct */
-  0x00,                       /* bcdDevice rel. 2.00 */
-  0x02,
+  0x03,                       /* bcdDevice rel. 2.00, modyfied to 1.03 */
+  0x01,
   USBD_IDX_MFC_STR,           /* Index of manufacturer string */
   USBD_IDX_PRODUCT_STR,       /* Index of product string */
   USBD_IDX_SERIAL_STR,        /* Index of serial number string */

@@ -129,12 +129,11 @@ __ALIGN_BEGIN static uint8_t USBD_TEMPLATE_CfgDesc[USB_CONFIG_DESC_SIZ] __ALIGN_
 {
   0x09, /* bLength: Configuration Descriptor size */
   USB_DESC_TYPE_CONFIGURATION, /* bDescriptorType: Configuration */
-  USB_CONFIG_DESC_SIZ,
-  /* wTotalLength: Bytes returned */
+  USB_CONFIG_DESC_SIZ, /* wTotalLength: Bytes returned */
   0x00,
   0x01,         /*bNumInterfaces: 1 interface*/
   0x01,         /*bConfigurationValue: Configuration value*/
-  0x04,         /*iConfiguration: Index of string descriptor describing the configuration*/
+  0x00,         /*iConfiguration: Index of string descriptor describing the configuration*/
   0x80,         /*bmAttributes: not bus powered and doesnt Supports Remote Wakeup (bm=bit map)*/
   0x32,         /*MaxPower 100 mA: this current is used for detecting Vbus (in 2mA units: 50*2=100)*/
 
